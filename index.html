@@ -1,28 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Benim Web Sitem</title>
+  <title>ondayelectronics</title>
   <style>
-    body { 
-      background-color: #000000; /* Siyah arka plan */
-      color: #ffffff; 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
-      padding-top: 50px; 
-      font-size: 20px; /* Tüm yazılar biraz daha büyük */
+    body {
+      margin: 0;
+      height: 100vh;
+      background-image: url("siyah1.jpg"); 
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      position: relative;
+      color: white;
     }
-    h1 { 
-      color: #f2aa4c; 
-      font-size: 50px; /* Başlığı daha büyük yaptım */
+
+    #logo {
+      width: 80%;
+      max-width: 1500px;
+      opacity: 0;
+      animation: fadeIn 3s ease-in-out forwards;
+      animation-delay: 0.5s;
     }
-    a { 
-      color: #00aced; 
-      font-size: 22px; /* Linki biraz büyüttüm */
+
+    .text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      font-size: 28px;
+      opacity: 0;
+      animation: fadeIn 2s ease-in-out forwards;
+    }
+
+    #footerText {
+      bottom: 50px;   /* alttaki yazı */
+      color: #f2aa4c;
+      opacity: 0;
+      animation-delay: 4s;
+    }
+
+    #middleText {
+      top: 100px;     /* sayfanın üst kısmında */
+      font-size: 36px;
+      color: #00aced;
+      animation-delay: 3s;
+    }
+
+    #extraText {
+      bottom: 120px;  /* footer yazısının üstünde */
+      font-size: 24px;
+      color: #ff4444;
+      animation-delay: 4s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
 <body>
-  <h1>ondayelectronics</h1>
-  <p>İletişim: <a href="mailto:ondayfatih@gmail.com">ondayfatih@gmail.com</a></p>
+  <img id="logo" src="logo6.png" alt="ondayelectronics logo">
+
+  <div id="middleText" class="text">Pek yakında görüşmek üzere :)</div>
+  <div id="extraText" class="text">İletişim: ondayfatih@gmail.com</div>
+  <div id="footerText" class="text">Fatih Önday - Elektrik Elektronik Mühendisi</div>
 </body>
 </html>
