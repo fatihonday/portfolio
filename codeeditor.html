@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Mini HTML Editör - Canlı Önizleme</title>
+  
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+
+<!-- CodeMirror CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/dracula.min.css">
+<style>
+  body { margin:0; font-family: Arial, sans-serif; display:flex; height:100vh; background:#fdfdf5; color:#000; transition: background 0.3s, color 0.3s; }
+  body.dark { background:#2b2b2b; color:#fdfdf5; }
+
+  #workspace { width:250px; background:#ececec; border-right:2px solid #333; overflow-y:auto; transition: all 0.3s; }
+  body.dark #workspace { background:#3a3a3a; }
+  #workspace.hidden { width:0; border:none; overflow:hidden; }
+
+  #workspace h3 { margin:10px; }
+  #workspace ul { list-style:none; padding:0; margin:0; }
+  #workspace li { padding:8px 10px; cursor:pointer; border-bottom:1px solid #aaa; user-select:none; }
+  #workspace li:hover { background:#ddd; }
+  body.dark #workspace li:hover { background:#555; }
+
+  #editor { flex:1; height:100%; box-sizing:border-box; display:flex; flex-direction:column; border-right:2px solid #333; }
+  #preview { width:50%; height:100%; border:none; }
+
+  .buttons { padding:5px; background:#ccc; }
+  body.dark .buttons { background:#444; }
+  button { margin-right:5px; padding:5px 10px; cursor:pointer; }
+
+  .CodeMirror { flex:1; height:auto; }
+
+  /* Sağ tık menüsü */
+  #contextMenu {
+    position:absolute;
+    background:#fff;
+    border:1px solid #888;
+    box-shadow:2px 2px 5px rgba(0,0,0,0.2);
+    display:none;
+    z-index:1000;
+  }
+  #contextMenu ul { list-style:none; margin:0; padding:5px 0; }
+  #contextMenu li {
+    padding:5px 20px;
+    cursor:pointer;
+  }
+  #contextMenu li:hover { background:#eee; }
+  body.dark #contextMenu { background:#444; color:#fff; border-color:#666; }
+  body.dark #contextMenu li:hover { background:#666; }
+
+  /* Dosyalar listesi */
+  .file-list { margin-left:15px; font-size:0.9em; }
+  .file-list li { border:none; padding:3px 5px; }
+</style>
+</head>
+<body>
+
+<div id="workspace">
+  <h3>Çalışmalar</h3>
+  <ul id="projectList"></ul>
+</div>
+
+<div id="editor">
+  <div class="buttons">
+    <button onclick="runCode()">Çalıştır</button>
+    <button onclick="clearCode()">Temizle</button>
+    <button onclick="saveAsProject()">Projeye Kaydet</button>
+    <button onclick="saveCode()">İndir</button>
+    <button onclick="toggleEditor()">Kod Alanını Aç/Kapat</button>
+    <input type="file" id="fileInput" style="display:none;" onchange="openFile(event)">
+    <button onclick="document.getElementById('fileInput').click()">Dosya Aç</button>
+    <button id="darkToggle" onclick="toggleDarkMode()">Karanlık Mod</button>
+    <button onclick="toggleWorkspace()">Panel Aç/Kapat</button>
+    <input type="file" id="fileUpload" style="display:none;" onchange="uploadFile(event)">
+  </div>
+  <textarea id="code" placeholder="HTML kodunu buraya yaz..."></textarea>
+</div>
+
+<iframe id="preview"></iframe>
+
+<!-- Sağ tık menüsü -->
+<div id="contextMenu">
+  <ul>
+    <li onclick="deleteProject()">Sil</li>
+    <li onclick="triggerFileUpload()">Dosya Yükle</li>
+  </ul>
+</div>
+
+<!-- CodeMirror JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/htmlmixed/htmlmixed.min.js"></script>
+
+<script>
+let editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+  mode: "htmlmixed",
+  theme: "default",
+  lineNumbers: true,
+  lineWrapping: true
+});
+
+// Aktif proje
+let selectedProject = null;
+
+// --- Projeler paneli ---
+function loadProjects() {
+  const list = document.getElementById("projectList");
+  list.innerHTML = "";
+  const projects = JSON.parse(localStorage.getItem("projects") || "{}");
+  for (let name in projects) {
+    const li = document.createElement("li");
+    li.textContent = name;
+    li.onclick = () => {
+      selectedProject = name;
+      editor.setValue(projects[name].code || "");
+      runCode();
+      renderFiles(name);
+    };
+    // Sağ tık menüsü
+    li.oncontextmenu = (e) => {
+      e.preventDefault();
+      showContextMenu(e, name);
+    };
+    list.appendChild(li);
+  }
+}
+
+function saveAsProject() {
+  const name = prompt("Proje ismi girin:");
+  if (!name) return;
+  const projects = JSON.parse(localStorage.getItem("projects") || "{}");
+  projects[name] = { code: editor.getValue(), files: {} };
+  localStorage.setItem("projects", JSON.stringify(projects));
+  loadProjects();
+}
+
+// Klavye kısayolu: Ctrl + E ile kod alanını aç/kapat
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key.toLowerCase() === 'q') {
+    e.preventDefault();
+    toggleEditor();
+  }
+});
+
+// Sağ tık menüsü
+function showContextMenu(e, projectName) {
+  selectedProject = projectName;
+  const menu = document.getElementById("contextMenu");
+  menu.style.display = "block";
+  menu.style.left = e.pageX + "px";
+  menu.style.top = e.pageY + "px";
+}
+window.addEventListener("click", () => {
+  document.getElementById("contextMenu").style.display = "none";
+});
+function deleteProject() {
+  if (!selectedProject) return;
+  const projects = JSON.parse(localStorage.getItem("projects") || "{}");
+  delete projects[selectedProject];
+  localStorage.setItem("projects", JSON.stringify(projects));
+  loadProjects();
+  selectedProject = null;
+  document.getElementById("contextMenu").style.display = "none";
+}
+
+// Dosya yükleme
+function triggerFileUpload() {
+  document.getElementById("fileUpload").click();
+}
+function uploadFile(event) {
+  const file = event.target.files[0];
+  if (!file || !selectedProject) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const projects = JSON.parse(localStorage.getItem("projects") || "{}");
+    if (!projects[selectedProject].files) projects[selectedProject].files = {};
+    projects[selectedProject].files[file.name] = e.target.result;
+    localStorage.setItem("projects", JSON.stringify(projects));
+    renderFiles(selectedProject);
+  };
+  reader.readAsDataURL(file);
+}
+
+// Dosyaları göster
+function renderFiles(projectName) {
+  const list = document.createElement("ul");
+  list.className = "file-list";
+  const projects = JSON.parse(localStorage.getItem("projects") || "{}");
+  const files = projects[projectName]?.files || {};
+  for (let fname in files) {
+    const li = document.createElement("li");
+    li.textContent = "📎 " + fname;
+    list.appendChild(li);
+  }
+
+  const projectList = document.getElementById("projectList").children;
+  for (let li of projectList) {
+    if (li.textContent === projectName) {
+      const old = li.querySelector("ul");
+      if (old) li.removeChild(old);
+      li.appendChild(list);
+    }
+  }
+}
+
+// --- Çalıştır / Temizle / Dosya işlemleri ---
+// Dosyaları kod içinde kullanabilmek için runCode() güncellendi
+function runCode() {
+  if (!selectedProject) {
+    document.getElementById("preview").srcdoc = editor.getValue();
+    return;
+  }
+  const projects = JSON.parse(localStorage.getItem("projects") || "{}");
+  const project = projects[selectedProject];
+  let code = editor.getValue();
+
+  // Dosya referanslarını base64 ile değiştir
+  if (project && project.files) {
+    for (let fname in project.files) {
+      const regex = new RegExp(`(["'])${fname}\\1`, "g");
+      code = code.replace(regex, `"${project.files[fname]}"`);
+    }
+  }
+
+  document.getElementById("preview").srcdoc = code;
+}
+
+function clearCode() {
+  editor.setValue('');
+  document.getElementById("preview").srcdoc = '';
+}
+
+function saveCode() {
+  const code = editor.getValue();
+  const blob = new Blob([code], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'myPage.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function openFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    editor.setValue(e.target.result);
+    runCode();
+  };
+  reader.readAsText(file);
+}
+
+// --- Karanlık mod ---
+function toggleDarkMode() {
+  document.body.classList.toggle("dark");
+  const theme = document.body.classList.contains("dark") ? "dracula" : "default";
+  editor.setOption("theme", theme);
+}
+
+// --- Panel aç/kapat ---
+function toggleWorkspace() {
+  document.getElementById("workspace").classList.toggle("hidden");
+}
+  
+// Kod alanını aç/kapat fonksiyonu
+function toggleEditor() {
+  const editorDiv = document.getElementById("editor");
+  const preview = document.getElementById("preview");
+  if (editorDiv.style.display === "none") {
+    editorDiv.style.display = "flex";
+    preview.style.width = "50%";
+  } else {
+    editorDiv.style.display = "none";
+    preview.style.width = "100%";
+  }
+}
+
+// Başlangıçta projeleri yükle
+loadProjects();
+</script>
+
+</body>
+</html>
