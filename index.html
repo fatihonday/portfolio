@@ -3,12 +3,12 @@
 <head>
   <title>ondayelectronics</title>
 
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="manifest" href="site.webmanifest">
-<link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
 
   <style>
     body {
@@ -64,6 +64,23 @@
       animation-delay: 4s;
     }
 
+    /* Yeni: Sol alt köşedeki Code Editor linki */
+    #codeEditorLink {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      color: #9b59b6; /* mor renk */
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: underline;
+      z-index: 1000;
+      transition: color 0.2s;
+    }
+    #codeEditorLink:hover {
+      color: #8e44ad;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
@@ -76,5 +93,8 @@
   <div id="middleText" class="text">Pek yakında görüşmek üzere :)</div>
   <div id="extraText" class="text">İletişim: ondayfatih@gmail.com</div>
   <div id="footerText" class="text">Fatih Önday - Elektrik Elektronik Mühendisi</div>
+
+  <!-- Sol alt köşedeki Code Editor linki -->
+  <div id="codeEditorLink" onclick="window.location.href='codeeditor.html'">Code Editor</div>
 </body>
 </html>
