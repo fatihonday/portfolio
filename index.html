@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ondayelectronics</title>
 
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -24,6 +26,7 @@
       font-family: Arial, sans-serif;
       position: relative;
       color: white;
+      overflow: hidden;
     }
 
     #logo {
@@ -41,35 +44,36 @@
       font-size: 28px;
       opacity: 0;
       animation: fadeIn 2s ease-in-out forwards;
+      padding: 0 10px; /* yazılar ekrana taşmasın diye */
+      box-sizing: border-box;
     }
 
     #footerText {
-      bottom: 50px;   /* alttaki yazı */
+      bottom: 50px;
       color: #f2aa4c;
-      opacity: 0;
       animation-delay: 4s;
     }
 
     #middleText {
-      top: 100px;     /* sayfanın üst kısmında */
+      top: 100px;
       font-size: 36px;
       color: #00aced;
       animation-delay: 3s;
     }
 
     #extraText {
-      bottom: 120px;  /* footer yazısının üstünde */
+      bottom: 120px;
       font-size: 24px;
       color: #ff4444;
       animation-delay: 4s;
     }
 
-    /* Yeni: Sol alt köşedeki Code Editor linki */
+    /* Sol alt köşedeki Code Editor linki */
     #codeEditorLink {
       position: fixed;
       left: 20px;
       bottom: 20px;
-      color: #9b59b6; /* mor renk */
+      color: #9b59b6;
       font-size: 18px;
       font-weight: bold;
       cursor: pointer;
@@ -85,6 +89,56 @@
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
     }
+
+    /* Mobil uyumluluk ayarları */
+    @media (max-width: 768px) {
+      #logo {
+        width: 90%;
+        max-width: 500px;
+      }
+
+      #middleText {
+        top: 60px;
+        font-size: 24px;
+      }
+
+      #extraText {
+        bottom: 100px;
+        font-size: 18px;
+      }
+
+      #footerText {
+        bottom: 40px;
+        font-size: 16px;
+      }
+
+      #codeEditorLink {
+        font-size: 14px;
+        left: 10px;
+        bottom: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #middleText {
+        top: 40px;
+        font-size: 20px;
+      }
+
+      #extraText {
+        bottom: 90px;
+        font-size: 16px;
+      }
+
+      #footerText {
+        bottom: 30px;
+        font-size: 14px;
+      }
+
+      #codeEditorLink {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -94,7 +148,6 @@
   <div id="extraText" class="text">İletişim: ondayfatih@gmail.com</div>
   <div id="footerText" class="text">Fatih Önday - Elektrik Elektronik Mühendisi</div>
 
-  <!-- Sol alt köşedeki Code Editor linki -->
   <div id="codeEditorLink" onclick="window.location.href='codeeditor.html'">Code Editor</div>
 </body>
 </html>
