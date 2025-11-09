@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>🧩 Kaydırmalı Yapboz (Animasyonlu + Rekor)</title>
+<style>
+  :root{
+    --bg:#0a0a0a; --panel:#111; --accent:#0ff; --muted:#9fb1c9;
+  }
+  body {
+    background: var(--bg);
+    color: #fff;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  header { padding: 10px; }
+  h2 { margin: 0; font-size: clamp(18px,4vw,26px) }
+  #meta { display:flex; gap:12px; align-items:center; justify-content:center; margin-top:8px; flex-wrap:wrap }
+  .pill { background: rgba(255,255,255,0.03); padding:6px 10px; border-radius:8px; font-size:14px; color:var(--muted) }
+
+  /* Canvas */
+  #boardWrap { display:flex; justify-content:center; padding:10px 8px; }
+  canvas {
+    border: 2px solid #fff;
+    cursor: pointer;
+    display: block;
+    margin: 10px auto;
+    width: 90vw;
+    height: 90vw;
+    max-width: 520px;
+    max-height: 520px;
+    touch-action: manipulation;
+    background: #000;
+  }
+
+  /* Buttons */
+  .controls { display:flex; gap:8px; justify-content:center; padding-bottom:14px; flex-wrap:wrap }
+  button {
+    margin: 8px;
+    background: #222;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: clamp(14px, 3vw, 16px);
+    transition: background .12s, transform .08s;
+  }
+  button:active { transform: translateY(1px); }
+  button:hover { background:#333; }
+
+  /* preview */
+  #preview {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    width: 22vw;
+    height: 22vw;
+    max-width: 120px;
+    max-height: 120px;
+    overflow: hidden;
+    box-shadow: 0 0 18px rgba(0,0,0,0.6);
+    background: #111;
+  }
+  #preview img { width:100%; height:100%; object-fit:cover; display:block }
+
+  /* Mobile: preview under canvas */
+  @media (max-width: 600px) {
+    #preview { position: static; margin: 0 auto 10px auto; width: 35vw; height:35vw; }
+  }
+
+  /* Level up overlay */
+  #levelUp {
+    position: fixed;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%) scale(.9);
+    background: linear-gradient(135deg, rgba(0,255,255,0.12), rgba(0,255,255,0.04));
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #001;
+    padding: 18px 26px;
+    border-radius: 12px;
+    font-weight:700;
+    font-size: clamp(22px,5vw,34px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease, transform .35s cubic-bezier(.2,.8,.2,1);
+    text-shadow: 0 6px 22px rgba(0,255,255,0.06);
+    z-index: 60;
+  }
+  #levelUp.show { opacity: 1; transform: translate(-50%,-50%) scale(1); pointer-events:auto; }
+
+  /* remove mobile tap highlight */
+  * { -webkit-tap-highlight-color: transparent; outline: none; }
+  button, canvas { -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color: transparent; }
+</style>
+</head>
+<body>
+  <header>
+    <h2>Kaydırmalı Yapboz</h2>
+    <div id="meta">
+      <div class="pill" id="levelLabel">Level: 1</div>
+      <div class="pill" id="movesLabel">Hamle: 0</div>
+      <div class="pill" id="bestLabel">En İyi: —</div>
+    </div>
+  </header>
+
+  <div id="boardWrap">
+    <canvas id="puzzle"></canvas>
+  </div>
+
+  <div class="controls">
+    <button id="hintBtn">💡 İpucu</button>
+    <button id="changeImgBtn">🖼️ Resmi Değiştir</button>
+    <button id="resetBtn">↺ Yeniden Karıştır</button>
+  </div>
+
+  <div id="preview"><img id="previewImg" src="" alt="Önizleme" /></div>
+
+  <div id="levelUp">LEVEL UP!</div>
+
+<script>
+/* ======= Ayarlar & başlangıç ======= */
+const canvas = document.getElementById('puzzle');
+const ctx = canvas.getContext('2d');
+
+const previewImgEl = document.getElementById('previewImg');
+const levelLabel = document.getElementById('levelLabel');
+const movesLabel = document.getElementById('movesLabel');
+const bestLabel = document.getElementById('bestLabel');
+const levelUpEl = document.getElementById('levelUp');
+
+const images = ["kaydırmayapbozgorsel1.jpg","kaydırmayapbozgorsel2.jpg","kaydırmayapbozgorsel3.jpg","kaydırmayapbozgorsel4.jpg"]; // klasörde olanlar
+let img = new Image();
+let currentImg = images[Math.floor(Math.random()*images.length)];
+img.src = currentImg;
+previewImgEl.src = currentImg;
+
+let level = 1;
+let size = 3;
+let tiles = []; // {sx,sy,x,y, anim?}
+let empty = {x:0,y:0};
+let tileSize = 0;
+let animating = false;
+let moveCount = 0;
+let animationDuration = 140; // ms
+
+// responsive canvas size
+function setCanvasSize() {
+  const dim = Math.min(window.innerWidth * 0.9, 520);
+  canvas.width = dim;
+  canvas.height = dim;
+  tileSize = dim / size;
+}
+window.addEventListener('resize', ()=>{ setCanvasSize(); drawTiles(); });
+
+/* ======== Helpers: storage key for best moves per level-size ======== */
+function bestKeyForLevel(lvl){
+  // store best per grid-size (e.g., size=3,4,5)
+  const grid = 2 + (lvl); // since level->size = 2+level earlier; but to keep consistent: we'll use size value
+  // Actually our size = 2 + level; but easier: use 'best_moves_sizeN'
+  return 'best_moves_size' + (2 + lvl);
+}
+
+/* ======== Init / Level ======== */
+img.onload = () => startLevel(false);
+function startLevel(resetMoveCount=true){
+  size = 2 + level; // level 1 -> 3, etc.
+  setCanvasSize();
+
+  tiles = [];
+  for(let y=0;y<size;y++){
+    for(let x=0;x<size;x++){
+      tiles.push({sx:x, sy:y, x:x, y:y});
+    }
+  }
+  // last tile is the empty one
+  empty = tiles.pop();
+  empty.x = size - 1;
+  empty.y = size - 1;
+
+  // reset counters
+  if(resetMoveCount) moveCount = 0;
+  updateLabels();
+
+  shuffleTiles();
+  drawTiles();
+}
+
+/* ======== Shuffle (instant moves, do not count) ======== */
+function shuffleTiles(){
+  const shuffles = Math.max(200, size*size*40);
+  for(let i=0;i<shuffles;i++){
+    const moves = getMovableTiles();
+    const choice = moves[Math.floor(Math.random()*moves.length)];
+    instantSwap(choice);
+  }
+}
+
+/* ======== Drawing with animation support ======== */
+let rafId = null;
+function drawTiles(timestamp){
+  // requestAnimationFrame loop for animations
+  rafId = requestAnimationFrame(drawTiles);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // draw each tile; if tile has anim, compute interpolated pos
+  tiles.forEach(tile => {
+    // if tile currently animating, compute progress
+    if(tile.anim){
+      const now = performance.now();
+      const a = tile.anim;
+      const t = Math.min(1, (now - a.start) / a.duration);
+      const ease = t<0?0:(t<1? (0.5 - Math.cos(Math.PI * t) / 2) : 1); // smooth ease
+      const drawX = (a.from.x + (a.to.x - a.from.x) * ease) * tileSize;
+      const drawY = (a.from.y + (a.to.y - a.from.y) * ease) * tileSize;
+      drawTileImage(tile, drawX, drawY);
+      if(t>=1){
+        // finish
+        tile.x = a.to.x; tile.y = a.to.y;
+        delete tile.anim;
+        animating = false;
+        // after finishing, check solved if last move
+        // (we'll check elsewhere)
+      }
+    } else {
+      // normal
+      // skip empty slot
+      if(tile.x === empty.x && tile.y === empty.y) return;
+      const dx = tile.x * tileSize;
+      const dy = tile.y * tileSize;
+      drawTileImage(tile, dx, dy);
+    }
+  });
+}
+
+function drawTileImage(tile, dx, dy){
+  const sx = tile.sx * (img.width / size);
+  const sy = tile.sy * (img.height / size);
+  const sW = img.width / size;
+  const sH = img.height / size;
+  ctx.drawImage(img, sx, sy, sW, sH, dx, dy, tileSize, tileSize);
+  // subtle stroke
+  ctx.strokeStyle = "rgba(0,0,0,0.35)";
+  ctx.lineWidth = Math.max(1, tileSize * 0.03);
+  ctx.strokeRect(dx + 0.5, dy + 0.5, tileSize - 1, tileSize - 1);
+}
+
+/* ======== Input handling (click/touch) ======== */
+function handleInput(e){
+  if(animating) return; // block during animations
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const x = Math.floor((clientX - rect.left) / tileSize);
+  const y = Math.floor((clientY - rect.top) / tileSize);
+  if(x<0||y<0||x>=size||y>=size) return;
+  const clicked = tiles.find(t => t.x === x && t.y === y);
+  if(!clicked) return;
+  if(canMove(clicked)){
+    animateSwap(clicked);
+  }
+}
+canvas.addEventListener('click', handleInput);
+canvas.addEventListener('touchstart', handleInput, {passive:false});
+
+/* ======== Movement utilities ======== */
+function canMove(tile){
+  return (tile.x === empty.x && Math.abs(tile.y - empty.y) === 1) ||
+         (tile.y === empty.y && Math.abs(tile.x - empty.x) === 1);
+}
+
+// instant swap for shuffling (no animation, no counting)
+function instantSwap(tile){
+  const ex = empty.x, ey = empty.y;
+  const tx = tile.x, ty = tile.y;
+  tile.x = ex; tile.y = ey;
+  empty.x = tx; empty.y = ty;
+}
+
+// animated swap used for player moves (counts)
+function animateSwap(tile){
+  animating = true;
+  const ex = empty.x, ey = empty.y;
+  // set animation object on tile (from current to empty)
+  tile.anim = {
+    from: {x: tile.x, y: tile.y},
+    to: {x: ex, y: ey},
+    start: performance.now(),
+    duration: animationDuration
+  };
+  // also mark empty visually? we'll just animate tile and update empties when finished after duration
+  // set empty to tile's pos immediately so other tiles won't try to move into it
+  empty.x = tile.x;
+  empty.y = tile.y;
+
+  // increment move count immediately (counts as player's move)
+  moveCount++;
+  updateLabels();
+
+  // schedule finish after duration
+  setTimeout(()=>{
+    // complete swap
+    tile.x = tile.anim.to.x;
+    tile.y = tile.anim.to.y;
+    delete tile.anim;
+    // empty already set to tile's old pos above
+    animating = false;
+    drawTiles(); // ensure final frame
+    // check win
+    if(isSolved()){
+      onSolved();
+    }
+  }, animationDuration + 5);
+}
+
+/* ======== Utility: get movable tiles ======== */
+function getMovableTiles(){
+  return tiles.filter(t => canMove(t));
+}
+
+/* ======== Win handling ======== */
+function isSolved(){
+  return tiles.every(t => t.x === t.sx && t.y === t.sy);
+}
+
+function onSolved(){
+  // stop animation loop momentarily? we'll show levelUp overlay
+  showLevelUpOverlay().then(()=> {
+    // check record
+    const key = bestKey();
+    const prevBest = localStorage.getItem(key);
+    const moves = moveCount;
+    if(!prevBest || moves < parseInt(prevBest,10)){
+      localStorage.setItem(key, String(moves));
+      // show congrats small overlay
+      showMessage(`Yeni rekor! ${moves} hamle`, 1200);
+    }
+    // advance level
+    level++;
+    startLevel(true);
+    updateLabels();
+  });
+}
+
+/* ======== Level Up overlay (returns Promise) ======== */
+function showLevelUpOverlay(){
+  return new Promise(resolve => {
+    levelUpEl.classList.add('show');
+    setTimeout(()=> {
+      levelUpEl.classList.remove('show');
+      resolve();
+    }, 900); // display ~900ms
+  });
+}
+
+/* ======== Labels & storage key ======== */
+function updateLabels(){
+  levelLabel.innerText = `Level: ${level}`;
+  movesLabel.innerText = `Hamle: ${moveCount}`;
+  // show best for this grid size if exists
+  const key = bestKey();
+  const best = localStorage.getItem(key);
+  bestLabel.innerText = `En İyi: ${best ? best + ' hamle' : '—'}`;
+}
+
+function bestKey(){
+  // store by grid size, since level->size = 2+level
+  const grid = (2 + level);
+  return 'puzzle_best_size' + grid;
+}
+
+/* ======== Small temporary message (bottom) ======== */
+function showMessage(text, ms=1000){
+  const el = document.createElement('div');
+  el.style.position='fixed';
+  el.style.left='50%';
+  el.style.bottom='18px';
+  el.style.transform='translateX(-50%)';
+  el.style.background='linear-gradient(90deg, rgba(255,255,255,0.06), rgba(0,255,255,0.06))';
+  el.style.border='1px solid rgba(255,255,255,0.06)';
+  el.style.color='#fff';
+  el.style.padding='8px 12px';
+  el.style.borderRadius='8px';
+  el.style.fontWeight='700';
+  el.style.zIndex = 80;
+  el.innerText = text;
+  document.body.appendChild(el);
+  setTimeout(()=> el.style.opacity='0', ms-200);
+  setTimeout(()=> el.remove(), ms);
+}
+
+/* ======== Buttons: hint, change image, reset ======== */
+document.getElementById('hintBtn').addEventListener('click', ()=>{
+  if(animating) return;
+  const movable = getMovableTiles();
+  if(movable.length === 0) return;
+  movable.sort((a,b)=>{
+    const da = Math.abs(a.x - a.sx) + Math.abs(a.y - a.sy);
+    const db = Math.abs(b.x - b.sx) + Math.abs(b.y - b.sy);
+    return da - db;
+  });
+  const best = movable[0];
+  animateSwap(best);
+});
+
+document.getElementById('changeImgBtn').addEventListener('click', ()=>{
+  if(animating) return;
+  const next = images[Math.floor(Math.random()*images.length)];
+  currentImg = next;
+  img = new Image();
+  img.onload = ()=> {
+    previewImgEl.src = currentImg;
+    // restart same level but reset moves
+    startLevel(true);
+  };
+  img.onerror = ()=> { alert('Görsel yüklenemedi: ' + currentImg); };
+  img.src = currentImg;
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(animating) return;
+  startLevel(true);
+  showMessage('Yeniden karıştırıldı',800);
+});
+
+/* ======== Kick off ======== */
+updateLabels();
+drawTiles(); // start RAF loop
+// ensure image loaded if not already
+if(img.complete) startLevel(false);
+</script>
+</body>
+</html>
