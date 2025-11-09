@@ -44,7 +44,7 @@
       font-size: 28px;
       opacity: 0;
       animation: fadeIn 2s ease-in-out forwards;
-      padding: 0 10px; /* yazılar ekrana taşmasın diye */
+      padding: 0 10px;
       box-sizing: border-box;
     }
 
@@ -85,59 +85,50 @@
       color: #8e44ad;
     }
 
+    /* Sağ alt köşedeki Kaydırmalı Yapboz linki */
+    #puzzleLink {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      color: #00aced;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: underline;
+      z-index: 1000;
+      transition: color 0.2s;
+    }
+    #puzzleLink:hover {
+      color: #0096c7;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
     }
 
-    /* Mobil uyumluluk ayarları */
+    /* Mobil uyumluluk */
     @media (max-width: 768px) {
       #logo {
         width: 90%;
         max-width: 500px;
       }
-
-      #middleText {
-        top: 60px;
-        font-size: 24px;
-      }
-
-      #extraText {
-        bottom: 100px;
-        font-size: 18px;
-      }
-
-      #footerText {
-        bottom: 40px;
-        font-size: 16px;
-      }
-
-      #codeEditorLink {
+      #middleText { top: 60px; font-size: 24px; }
+      #extraText { bottom: 100px; font-size: 18px; }
+      #footerText { bottom: 40px; font-size: 16px; }
+      #codeEditorLink, #puzzleLink {
         font-size: 14px;
-        left: 10px;
         bottom: 10px;
       }
+      #codeEditorLink { left: 10px; }
+      #puzzleLink { right: 10px; }
     }
 
     @media (max-width: 480px) {
-      #middleText {
-        top: 40px;
-        font-size: 20px;
-      }
-
-      #extraText {
-        bottom: 90px;
-        font-size: 16px;
-      }
-
-      #footerText {
-        bottom: 30px;
-        font-size: 14px;
-      }
-
-      #codeEditorLink {
-        font-size: 12px;
-      }
+      #middleText { top: 40px; font-size: 20px; }
+      #extraText { bottom: 90px; font-size: 16px; }
+      #footerText { bottom: 30px; font-size: 14px; }
+      #codeEditorLink, #puzzleLink { font-size: 12px; }
     }
   </style>
 </head>
@@ -149,5 +140,6 @@
   <div id="footerText" class="text">Fatih Önday - Elektrik Elektronik Mühendisi</div>
 
   <div id="codeEditorLink" onclick="window.location.href='codeeditor.html'">Code Editor</div>
+  <div id="puzzleLink" onclick="window.location.href='kaydirma_yapboz.html'">Kaydırmalı Yapboz</div>
 </body>
 </html>
