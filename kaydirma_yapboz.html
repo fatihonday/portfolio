@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<title>🧩 Kaydırmalı Yapboz (Animasyonlu + Rekor)</title>
+<title>Onday Electronics Kaydırmalı Yapboz</title>
 <style>
   :root{
     --bg:#0a0a0a; --panel:#111; --accent:#0ff; --muted:#9fb1c9;
@@ -226,8 +226,15 @@ function drawTiles(timestamp){
         tile.x = a.to.x; tile.y = a.to.y;
         delete tile.anim;
         animating = false;
-        // after finishing, check solved if last move
-        // (we'll check elsewhere)
+        // --- NEW: güvenilir win kontrolü animasyonun bitişinde ---
+        // küçük gecikme ile kontrol et; böylece tüm DOM/canvas güncellemeleri tamamlanmış olur
+        setTimeout(()=> {
+          if (isSolved()) {
+            // sadece bir kez tetikle
+            if (!animating) onSolved();
+          }
+        }, 20);
+        // -------------------------------------------------------
       }
     } else {
       // normal
@@ -314,7 +321,7 @@ function animateSwap(tile){
     // empty already set to tile's old pos above
     animating = false;
     drawTiles(); // ensure final frame
-    // check win
+    // check win (redundant but harmless)
     if(isSolved()){
       onSolved();
     }
@@ -398,7 +405,7 @@ function showMessage(text, ms=1000){
 }
 
 /* ======== Buttons: hint, change image, reset ======== */
-document.getElementById('hintBtn').addEventListener('click', ()=>{
+document.getElementById('hintBtn').addEventListener('click', ()=>{  
   if(animating) return;
   const movable = getMovableTiles();
   if(movable.length === 0) return;
