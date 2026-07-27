@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Mini HTML Editör - Canlı Önizleme</title>
+<title>Mini HTML Editör - Horizontal Tree Schema & Smart Console</title>
 
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -106,7 +106,7 @@
 
   /* Sol Yan Barlar */
   .sidebar-panel {
-    width: 210px;
+    width: 240px;
     background: #f0f0f0;
     border-right: 1px solid #ccc;
     display: none;
@@ -131,7 +131,7 @@
   body.dark .sidebar-header { color: #888; border-color: #333; }
 
   .tool-item {
-    padding: 7px 10px;
+    padding: 6px 10px;
     font-size: 12px;
     cursor: pointer;
     border-bottom: 1px solid #eaebec;
@@ -161,26 +161,69 @@
   #projectList li .del-proj { opacity: 0; color: #e74c3c; border: none; background: none; cursor: pointer; font-size: 11px; }
   #projectList li:hover .del-proj { opacity: 1; }
 
-  #activeProjectFiles { display: flex; flex-direction: column; gap: 4px; padding: 6px 10px; max-height: 120px; overflow-y: auto; }
-  .file-chip {
-    display: flex; align-items: center; justify-content: space-between; background: #fff;
-    border: 1px solid #ccc; padding: 2px 6px; border-radius: 2px; font-size: 11px;
+  /* MİMARİ DOSYA AĞACI VE BUTONLAR */
+  .tree-toolbar {
+    display: flex;
+    gap: 2px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #ddd;
+    background: rgba(0,0,0,0.02);
   }
+  body.dark .tree-toolbar { border-color: #333; background: rgba(255,255,255,0.02); }
+
+  .tree-btn {
+    font-size: 10px;
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 2px;
+    cursor: pointer;
+    color: #333;
+    white-space: nowrap;
+  }
+  body.dark .tree-btn { background: #2d2d2d; border-color: #444; color: #ccc; }
+  .tree-btn:hover { background: #e0e0e0; }
+  body.dark .tree-btn:hover { background: #383838; }
+
+  #fileTreeContainer { flex: 1; overflow-y: auto; padding: 4px 0; }
+  .tree-node { font-size: 11px; font-family: monospace; user-select: none; }
+  .tree-row { display: flex; align-items: center; justify-content: space-between; padding: 3px 8px; cursor: pointer; color: #444; }
+  body.dark .tree-row { color: #bbb; }
+  .tree-row:hover { background: #e0e0e0; }
+  body.dark .tree-row:hover { background: #2a2d2e; }
+  .tree-row.active { font-weight: bold; color: #007acc; background: rgba(0,122,204,0.1); }
+  body.dark .tree-row.active { color: #75beff; background: rgba(117,190,255,0.1); }
+  .tree-row .node-actions { opacity: 0; display: flex; gap: 4px; }
+  .tree-row:hover .node-actions { opacity: 1; }
+  .node-btn { background: none; border: none; font-size: 10px; color: #888; cursor: pointer; padding: 0 2px; }
+  .node-btn:hover { color: #e74c3c; }
+  .tree-children { padding-left: 14px; }
+
+  #activeProjectFiles { display: flex; flex-direction: column; gap: 4px; padding: 4px 10px; max-height: 90px; overflow-y: auto; }
+  .file-chip { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #ccc; padding: 2px 6px; border-radius: 2px; font-size: 11px; }
   body.dark .file-chip { background: #2d2d2d; border-color: #444; color: #eee; }
   .file-chip .del-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 10px; }
   .file-chip .del-btn:hover { color: #e74c3c; }
 
-  #dropZone {
-    border: 1px dashed #aaa; border-radius: 2px; padding: 8px; font-size: 11px;
-    color: #666; background: transparent; cursor: pointer; margin: 10px; text-align: center;
-  }
+  #dropZone { border: 1px dashed #aaa; border-radius: 2px; padding: 6px; font-size: 11px; color: #666; background: transparent; cursor: pointer; margin: 6px 10px; text-align: center; }
   body.dark #dropZone { color: #aaa; border-color: #555; }
   #dropZone.dragover { border-color: #27ae60; color: #27ae60; }
 
-  /* WorkSpace */
+  /* WorkSpace & Dosya Sekmeleri (Tabs) */
   #mainWorkspace { flex: 1; display: flex; height: 100%; overflow: hidden; }
   #editor { flex: 1; height: 100%; display: flex; flex-direction: column; border-right: 1px solid #ccc; }
   body.dark #editor { border-color: #383838; }
+
+  #editorTabs { height: 28px; background: #e1e1e1; border-bottom: 1px solid #ccc; display: flex; align-items: center; padding-left: 4px; user-select: none; overflow-x: auto; }
+  body.dark #editorTabs { background: #2d2d2d; border-color: #383838; }
+
+  .tab-item { height: 28px; padding: 0 10px; font-size: 11px; font-family: monospace; display: flex; align-items: center; gap: 6px; background: #d8d8d8; border-right: 1px solid #ccc; color: #555; cursor: pointer; white-space: nowrap; }
+  body.dark .tab-item { background: #252526; border-color: #383838; color: #888; }
+  .tab-item.active { background: #f5f5f5; color: #000; font-weight: bold; border-bottom: 2px solid #007acc; }
+  body.dark .tab-item.active { background: #1e1e1e; color: #fff; border-bottom-color: #75beff; }
+  .tab-close { font-size: 10px; border-radius: 50%; padding: 0 3px; color: #888; }
+  .tab-close:hover { background: rgba(0,0,0,0.1); color: #e74c3c; }
+
   #preview { width: 50%; height: 100%; border: none; background: #fff; }
   .CodeMirror { flex: 1; height: auto; font-size: 13px; }
 
@@ -195,10 +238,29 @@
     font-family: monospace;
     font-size: 11px;
     z-index: 20;
+    transition: height 0.2s ease-in-out;
   }
-  
+
+  /* DARALTILDIĞINDA SADECE SON SATIR DÜZENİ (~54px) */
+  #consoleBar.minimized {
+    height: 54px !important;
+  }
+  #consoleBar.minimized #consoleInputArea {
+    display: none !important;
+  }
+  #consoleBar.minimized #consoleLogs {
+    padding: 2px 6px;
+    overflow: hidden;
+  }
+  #consoleBar.minimized #consoleLogs .log-line {
+    display: none;
+  }
+  #consoleBar.minimized #consoleLogs .log-line:last-child {
+    display: flex !important;
+  }
+
   .console-header {
-    height: 24px;
+    height: 28px;
     background: #252526;
     padding: 0 8px;
     display: flex;
@@ -209,15 +271,16 @@
   }
   .console-header-title { font-weight: bold; color: #aaa; font-size: 11px; }
 
-  #consoleLogs {
-    flex: 1;
-    overflow-y: auto;
-    padding: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+  .console-btn-icon {
+    cursor: pointer;
+    color: #aaa;
+    font-size: 11px;
+    padding: 2px 5px;
+    border-radius: 2px;
   }
+  .console-btn-icon:hover { color: #fff; background: rgba(255,255,255,0.1); }
 
+  #consoleLogs { flex: 1; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 3px; }
   .log-line { display: flex; gap: 8px; line-height: 1.3; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 2px; }
   .log-time { color: #666; font-size: 10px; white-space: nowrap; }
   .log-msg { white-space: pre-wrap; word-break: break-all; }
@@ -226,54 +289,88 @@
   .log-warn { color: #ce9178; }
   .log-error { color: #f48771; }
 
-  /* Konsol İçi İsim Alma Alanı */
-  #consoleInputArea {
-    padding: 4px 8px;
-    background: #2d2d2d;
-    border-top: 1px solid #444;
-    display: none;
-    align-items: center;
-    gap: 6px;
-  }
+  #consoleInputArea { padding: 4px 8px; background: #2d2d2d; border-top: 1px solid #444; display: none; align-items: center; gap: 6px; }
   #consoleInputArea span { color: #4ec9b0; font-weight: bold; }
-  #consoleInput {
-    flex: 1;
-    background: #1e1e1e;
-    border: 1px solid #444;
-    color: #fff;
-    padding: 2px 6px;
-    font-size: 11px;
-    border-radius: 2px;
-    outline: none;
-  }
-  #consoleInputBtn {
-    background: #0e639c;
-    color: #fff;
-    border: none;
-    padding: 3px 10px;
-    font-size: 11px;
-    cursor: pointer;
-    border-radius: 2px;
-  }
+  #consoleInput { flex: 1; background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 2px 6px; font-size: 11px; border-radius: 2px; outline: none; }
+  #consoleInputBtn { background: #0e639c; color: #fff; border: none; padding: 3px 10px; font-size: 11px; cursor: pointer; border-radius: 2px; }
   #consoleInputBtn:hover { background: #1177bb; }
 
-  /* Modal (Not Defteri) */
-  .modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 100;
-  }
-  .modal-box {
-    background: #fff; border-radius: 4px; width: 450px; max-width: 90%;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden;
-  }
+  /* Modal */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
+  .modal-box { background: #fff; border-radius: 4px; width: 600px; max-width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; }
   body.dark .modal-box { background: #252526; color: #eee; border: 1px solid #444; }
   .modal-header { padding: 8px 12px; background: #e8e8e8; font-size: 12px; font-weight: bold; display: flex; justify-content: space-between; }
   body.dark .modal-header { background: #2d2d2d; }
-  .modal-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .modal-body { padding: 15px; display: flex; flex-direction: column; gap: 8px; max-height: 70vh; overflow-y: auto; }
   #notepadTextarea { width: 100%; height: 200px; padding: 8px; border: 1px solid #ccc; border-radius: 3px; font-family: monospace; font-size: 12px; resize: vertical; }
   body.dark #notepadTextarea { background: #1e1e1e; color: #eee; border-color: #444; }
   .modal-footer { padding: 8px 12px; text-align: right; background: #f5f5f5; }
   body.dark .modal-footer { background: #252526; }
+
+  /* SOLDAN SAĞA AÇILAN İNTERAKTİF ŞEMA TUVALİ */
+  #schemaCanvasContainer {
+    position: relative;
+    width: 100%;
+    height: 520px;
+    background: #fafafa;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+  }
+  body.dark #schemaCanvasContainer { background: #181818; border-color: #383838; }
+  #schemaCanvasContainer:active { cursor: grabbing; }
+
+  #schemaViewport {
+    position: absolute;
+    top: 0; left: 0;
+    transform-origin: 0 0;
+  }
+
+  .schema-reset-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    z-index: 10;
+    background: #fff; border: 1px solid #ccc;
+    padding: 4px 8px; font-size: 11px; border-radius: 3px; cursor: pointer;
+  }
+  body.dark .schema-reset-btn { background: #2d2d2d; border-color: #444; color: #eee; }
+
+  .block-node {
+    position: absolute;
+    width: 140px;
+    height: 32px;
+    background: #ffffff;
+    border: 2px solid #007acc;
+    border-radius: 4px;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: bold;
+    font-family: monospace;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  body.dark .block-node { background: #252526; color: #eee; border-color: #007acc; }
+
+  .block-node.folder { border-color: #f39c12; background: #fffbf0; }
+  body.dark .block-node.folder { background: #2a2415; border-color: #f39c12; }
+
+  .block-node.root { border-color: #27ae60; background: #f0fff4; }
+  body.dark .block-node.root { background: #132719; border-color: #27ae60; }
+
+  svg.connections-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 5000px; height: 5000px;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -326,7 +423,16 @@
       <button class="tool-item" onclick="saveCode()">HTML İndir</button>
       <button class="tool-item" onclick="openNotepadModal()">Not Defteri</button>
 
-      <div style="font-size:11px; font-weight:bold; padding:8px 10px 2px 10px; color:#888;">YÜKLÜ DOSYALAR</div>
+      <div style="font-size:11px; font-weight:bold; padding:8px 10px 2px 10px; color:#888;">PROJE MİMARİSİ</div>
+      <div class="tree-toolbar">
+        <button class="tree-btn" onclick="promptCreateFile()">+ Dosya</button>
+        <button class="tree-btn" onclick="promptCreateFolder()">+ Klasör</button>
+        <button class="tree-btn" onclick="openSchemaModal()">📐 Şema</button>
+      </div>
+
+      <div id="fileTreeContainer"></div>
+
+      <div style="font-size:11px; font-weight:bold; padding:6px 10px 2px 10px; color:#888;">VARLIKLAR (ASSETS)</div>
       <div id="activeProjectFiles"></div>
 
       <div id="dropZone" onclick="document.getElementById('fileUpload').click()">
@@ -336,7 +442,8 @@
 
     <div id="mainWorkspace">
       <div id="editor">
-        <textarea id="code" placeholder="HTML kodunu buraya yaz..."></textarea>
+        <div id="editorTabs"></div>
+        <textarea id="code"></textarea>
       </div>
       <iframe id="preview"></iframe>
     </div>
@@ -345,17 +452,18 @@
   <div id="consoleBar">
     <div class="console-header">
       <span class="console-header-title">Console / Bildirim Paneli</span>
-      <div style="display:flex; gap:8px;">
-        <span style="cursor:pointer; color:#aaa; font-size:10px;" onclick="clearConsoleLogs()">Temizle</span>
-        <span style="cursor:pointer; color:#aaa;" onclick="toggleConsoleBar()">✕</span>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <span class="console-btn-icon" onclick="clearConsoleLogs()" title="Temizle">🧹 Temizle</span>
+        <span class="console-btn-icon" id="consoleMinMaxBtn" onclick="toggleConsoleMinimize()" title="Aşağı/Yukarı Daralt">▼</span>
+        <span class="console-btn-icon" onclick="toggleConsoleBar(false)" title="Kapat">✕</span>
       </div>
     </div>
     <div id="consoleLogs"></div>
     
     <div id="consoleInputArea">
       <span id="consoleInputLabel">Proje Adı:</span>
-      <input type="text" id="consoleInput" placeholder="Yeni proje ismini girin...">
-      <button id="consoleInputBtn" onclick="submitConsoleInput()">Oluştur</button>
+      <input type="text" id="consoleInput" placeholder="Yeni ismi girin...">
+      <button id="consoleInputBtn" onclick="submitConsoleInput()">Tamam</button>
     </div>
   </div>
 
@@ -372,6 +480,27 @@
     </div>
     <div class="modal-footer">
       <button class="btn-plain" style="border:1px solid #ccc;" onclick="saveNotepad()">Notları Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="schemaModal">
+  <div class="modal-box" style="width: 850px;">
+    <div class="modal-header">
+      <span>Yatay Ağaç Şeması (Soldan Sağa - Sürükle / Yakınlaştır)</span>
+      <span style="cursor:pointer;" onclick="closeSchemaModal()">✕</span>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <div id="schemaCanvasContainer">
+        <button class="schema-reset-btn" onclick="resetCanvasTransform()">Görünümü Sıfırla</button>
+        <div id="schemaViewport">
+          <svg id="connectionsLayer" class="connections-layer"></svg>
+          <div id="nodesLayer"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-plain" style="border:1px solid #ccc;" onclick="closeSchemaModal()">Kapat</button>
     </div>
   </div>
 </div>
@@ -396,19 +525,351 @@ let editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 });
 
 let selectedProject = null;
+let activeFilePath = "index.html"; 
+let openTabs = ["index.html"]; 
 let consoleCallback = null;
 
-// --- KONSOL BİLDİRİM VE GİRDİ YÖNETİMİ ---
+let projectData = {
+  tree: {
+    "index.html": { type: "file", content: "\n<div class=\"container\">\n  <h1>Onday Electronics Proje Mimarisi</h1>\n  <button id=\"btn\">Tıkla</button>\n</div>" },
+    "css": {
+      type: "folder",
+      children: {
+        "style.css": { type: "file", content: "/* Ana Stiller */" }
+      }
+    },
+    "js": {
+      type: "folder",
+      children: {
+        "app.js": { type: "file", content: "// Uygulama Mantığı" },
+        "modules": {
+          type: "folder",
+          children: {
+            "storage.js": { type: "file", content: "// Depolama Modülü" },
+            "history.js": { type: "file", content: "// Geçmiş Modülü" }
+          }
+        }
+      }
+    }
+  },
+  files: {},
+  notes: ""
+};
+
+function getNodeByPath(path) {
+  const parts = path.split("/").filter(Boolean);
+  let curr = projectData.tree;
+  for (let i = 0; i < parts.length; i++) {
+    if (curr[parts[i]]) {
+      if (i === parts.length - 1) return curr[parts[i]];
+      curr = curr[parts[i]].children;
+    } else {
+      return null;
+    }
+  }
+  return null;
+}
+
+function switchTab(path) {
+  if (activeFilePath) {
+    const activeNode = getNodeByPath(activeFilePath);
+    if (activeNode && activeNode.type === "file") {
+      activeNode.content = editor.getValue();
+    }
+  }
+
+  activeFilePath = path;
+  if (!openTabs.includes(path)) openTabs.push(path);
+
+  renderTabs();
+  renderFileTree();
+
+  const targetNode = getNodeByPath(path);
+  if (targetNode && targetNode.type === "file") {
+    if (path.endsWith(".html")) editor.setOption("mode", "htmlmixed");
+    else if (path.endsWith(".css")) editor.setOption("mode", "css");
+    else if (path.endsWith(".js")) editor.setOption("mode", "javascript");
+    else editor.setOption("mode", "text/plain");
+
+    editor.setValue(targetNode.content || "");
+  }
+}
+
+function closeTab(path, event) {
+  if (event) event.stopPropagation();
+  openTabs = openTabs.filter(p => p !== path);
+  
+  if (activeFilePath === path) {
+    if (openTabs.length > 0) {
+      switchTab(openTabs[openTabs.length - 1]);
+    } else {
+      activeFilePath = null;
+      editor.setValue("");
+      renderTabs();
+      renderFileTree();
+    }
+  } else {
+    renderTabs();
+  }
+}
+
+function renderTabs() {
+  const container = document.getElementById("editorTabs");
+  container.innerHTML = "";
+
+  openTabs.forEach(path => {
+    const tabEl = document.createElement("div");
+    tabEl.className = `tab-item ${path === activeFilePath ? "active" : ""}`;
+    tabEl.onclick = () => switchTab(path);
+
+    const fileName = path.split("/").pop();
+    tabEl.innerHTML = `<span>${fileName}</span><span class="tab-close" onclick="closeTab('${path}', event)">✕</span>`;
+    container.appendChild(tabEl);
+  });
+}
+
+function renderFileTree() {
+  const container = document.getElementById("fileTreeContainer");
+  container.innerHTML = "";
+
+  function buildTreeUI(treeObj, currentPath) {
+    const fragment = document.createDocumentFragment();
+
+    for (let name in treeObj) {
+      const node = treeObj[name];
+      const fullPath = currentPath ? `${currentPath}/${name}` : name;
+
+      const nodeEl = document.createElement("div");
+      nodeEl.className = "tree-node";
+
+      if (node.type === "folder") {
+        const row = document.createElement("div");
+        row.className = "tree-row";
+        row.innerHTML = `<span>📁 <b>${name}</b></span>
+          <div class="node-actions">
+            <button class="node-btn" onclick="promptFolderAddChoice('${fullPath}')" title="Dosya/Klasör Ekle">+</button>
+            <button class="node-btn" onclick="deleteNode('${fullPath}')" title="Klasörü Sil">✕</button>
+          </div>`;
+
+        const childrenContainer = document.createElement("div");
+        childrenContainer.className = "tree-children";
+        if (node.children) {
+          childrenContainer.appendChild(buildTreeUI(node.children, fullPath));
+        }
+
+        nodeEl.appendChild(row);
+        nodeEl.appendChild(childrenContainer);
+      } else {
+        const row = document.createElement("div");
+        row.className = `tree-row ${fullPath === activeFilePath ? "active" : ""}`;
+        row.onclick = () => switchTab(fullPath);
+
+        let icon = "📄";
+        if (name.endsWith(".css")) icon = "🎨";
+        if (name.endsWith(".js")) icon = "⚡";
+
+        row.innerHTML = `<span>${icon} ${name}</span>
+          <div class="node-actions">
+            <button class="node-btn" onclick="deleteNode('${fullPath}')" title="Dosyayı Sil">✕</button>
+          </div>`;
+
+        nodeEl.appendChild(row);
+      }
+
+      fragment.appendChild(nodeEl);
+    }
+
+    return fragment;
+  }
+
+  container.appendChild(buildTreeUI(projectData.tree, ""));
+}
+
+/* YATAY AĞAÇ ŞEMASI (SOLDAN SAĞA) */
+let canvasScale = 1;
+let canvasPanX = 40;
+let canvasPanY = 40;
+let isPanning = false;
+let startX = 0, startY = 0;
+
+function updateViewportTransform() {
+  const vp = document.getElementById("schemaViewport");
+  vp.style.transform = `translate(${canvasPanX}px, ${canvasPanY}px) scale(${canvasScale})`;
+}
+
+function resetCanvasTransform() {
+  canvasScale = 1;
+  canvasPanX = 40;
+  canvasPanY = 40;
+  updateViewportTransform();
+}
+
+function initCanvasInteractions() {
+  const container = document.getElementById("schemaCanvasContainer");
+
+  container.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const zoomFactor = 0.1;
+    if (e.deltaY < 0) {
+      canvasScale = Math.min(canvasScale + zoomFactor, 2.5);
+    } else {
+      canvasScale = Math.max(canvasScale - zoomFactor, 0.4);
+    }
+    updateViewportTransform();
+  }, { passive: false });
+
+  container.addEventListener("mousedown", (e) => {
+    if (e.target.tagName === "BUTTON") return;
+    isPanning = true;
+    startX = e.clientX - canvasPanX;
+    startY = e.clientY - canvasPanY;
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    if (!isPanning) return;
+    canvasPanX = e.clientX - startX;
+    canvasPanY = e.clientY - startY;
+    updateViewportTransform();
+  });
+
+  window.addEventListener("mouseup", () => {
+    isPanning = false;
+  });
+}
+
+function renderCustomBlockSchema() {
+  const nodesContainer = document.getElementById("nodesLayer");
+  const svgContainer = document.getElementById("connectionsLayer");
+
+  nodesContainer.innerHTML = "";
+  svgContainer.innerHTML = "";
+
+  const nodeWidth = 140;
+  const nodeHeight = 32;
+  const levelGapX = 200; 
+  const rowGapY = 48;    
+
+  let currentY = 20;
+  let nodesList = [];
+
+  function buildHorizontalTree(treeObj, depth = 1, parentId = "node_root") {
+    for (let name in treeObj) {
+      const node = treeObj[name];
+      const id = "node_" + Math.random().toString(36).substr(2, 8);
+      
+      const nodeData = {
+        id,
+        name,
+        type: node.type,
+        parentId,
+        depth,
+        x: depth * levelGapX,
+        y: currentY
+      };
+
+      nodesList.push(nodeData);
+      currentY += rowGapY;
+
+      if (node.type === "folder" && node.children) {
+        buildHorizontalTree(node.children, depth + 1, id);
+      }
+    }
+  }
+
+  const rootId = "node_root";
+  const rootNode = {
+    id: rootId,
+    name: selectedProject || "KÖK DİZİN",
+    type: "root",
+    parentId: null,
+    depth: 0,
+    x: 20,
+    y: 20
+  };
+
+  nodesList.push(rootNode);
+  currentY += rowGapY;
+
+  buildHorizontalTree(projectData.tree, 1, rootId);
+
+  let nodeMap = {};
+  nodesList.forEach(n => nodeMap[n.id] = n);
+
+  nodesList.forEach(node => {
+    const nodeDiv = document.createElement("div");
+    let icon = node.type === "root" ? "🚀" : (node.type === "folder" ? "📁" : "📄");
+    if (node.name.endsWith(".css")) icon = "🎨";
+    if (node.name.endsWith(".js")) icon = "⚡";
+
+    nodeDiv.className = `block-node ${node.type}`;
+    nodeDiv.style.left = node.x + "px";
+    nodeDiv.style.top = node.y + "px";
+    nodeDiv.title = node.name;
+    nodeDiv.innerHTML = `<span>${icon}</span> <span style="overflow:hidden; text-overflow:ellipsis;">${node.name}</span>`;
+
+    nodesContainer.appendChild(nodeDiv);
+
+    if (node.parentId && nodeMap[node.parentId]) {
+      const parent = nodeMap[node.parentId];
+
+      const parentX = parent.x + nodeWidth;
+      const parentY = parent.y + (nodeHeight / 2);
+
+      const childX = node.x;
+      const childY = node.y + (nodeHeight / 2);
+
+      const midX = parentX + (childX - parentX) / 2;
+      const pathData = `M ${parentX} ${parentY} L ${midX} ${parentY} L ${midX} ${childY} L ${childX} ${childY}`;
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", pathData);
+      path.setAttribute("stroke", "#007acc");
+      path.setAttribute("stroke-width", "2");
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke-linejoin", "round");
+
+      svgContainer.appendChild(path);
+    }
+  });
+
+  resetCanvasTransform();
+}
+
+function openSchemaModal() {
+  document.getElementById("schemaModal").style.display = "flex";
+  renderCustomBlockSchema();
+}
+
+function closeSchemaModal() {
+  document.getElementById("schemaModal").style.display = "none";
+}
+
+/* =============================================================
+   KONSOL DARALTMA VE SABİT TERCIH MANTIĞI (DÜZELTİLDİ)
+   ============================================================= */
+
+function toggleConsoleMinimize() {
+  const consoleBar = document.getElementById("consoleBar");
+  const minMaxBtn = document.getElementById("consoleMinMaxBtn");
+  
+  const isMin = consoleBar.classList.toggle("minimized");
+  minMaxBtn.textContent = isMin ? "▲" : "▼";
+  
+  const logs = document.getElementById("consoleLogs");
+  logs.scrollTop = logs.scrollHeight;
+}
+
 function toggleConsoleBar(open) {
   const bar = document.getElementById("consoleBar");
   const btn = document.getElementById("consoleToggleBtn");
   const isVisible = bar.style.display === "flex";
   
   if (open === true || (open === undefined && !isVisible)) {
-    bar.style.display = "flex";
+    bar.style.display = "flex"; 
+    // DÜZELTME: Otomatik çağrıldığında kullanıcının minimized (tek satır) ayarı bozulmaz!
     btn.classList.add("active");
   } else {
-    bar.style.display = "none";
+    bar.style.display = "none"; 
     btn.classList.remove("active");
   }
 }
@@ -418,29 +879,31 @@ function logToConsole(msg, type = "info") {
   const logs = document.getElementById("consoleLogs");
   const line = document.createElement("div");
   line.className = "log-line";
-
   const timeStr = new Date().toLocaleTimeString();
   line.innerHTML = `<span class="log-time">[${timeStr}]</span> <span class="log-msg log-${type}">${msg}</span>`;
-  
   logs.appendChild(line);
   logs.scrollTop = logs.scrollHeight;
 }
 
-function clearConsoleLogs() {
-  document.getElementById("consoleLogs").innerHTML = "";
-}
+function clearConsoleLogs() { document.getElementById("consoleLogs").innerHTML = ""; }
 
 function requestConsoleInput(label, defaultValue, callback) {
   toggleConsoleBar(true);
+  
+  // Eğer konsol daraltılmışsa, veri girişi yapılabilmesi için geçici olarak genişlet
+  const consoleBar = document.getElementById("consoleBar");
+  if (consoleBar.classList.contains("minimized")) {
+    consoleBar.classList.remove("minimized");
+    document.getElementById("consoleMinMaxBtn").textContent = "▼";
+  }
+
   const inputArea = document.getElementById("consoleInputArea");
   const inputEl = document.getElementById("consoleInput");
   const labelEl = document.getElementById("consoleInputLabel");
-
   labelEl.textContent = label;
   inputEl.value = defaultValue || "";
   inputArea.style.display = "flex";
   inputEl.focus();
-
   consoleCallback = callback;
 }
 
@@ -448,7 +911,6 @@ function submitConsoleInput() {
   const inputArea = document.getElementById("consoleInputArea");
   const inputEl = document.getElementById("consoleInput");
   const val = inputEl.value.trim();
-  
   inputArea.style.display = "none";
   if (consoleCallback) {
     const cb = consoleCallback;
@@ -457,20 +919,15 @@ function submitConsoleInput() {
   }
 }
 
-document.getElementById("consoleInput").addEventListener("keyup", (e) => {
-  if (e.key === "Enter") submitConsoleInput();
-});
+document.getElementById("consoleInput").addEventListener("keyup", (e) => { if (e.key === "Enter") submitConsoleInput(); });
 
-// Database Erişimi
 async function getProjects() { return (await localforage.getItem("projects")) || {}; }
 async function setProjects(projects) { await localforage.setItem("projects", projects); }
 
-// Sol Bar Yönetimi
 async function toggleSidebar(id) {
   const target = document.getElementById(id);
   const isOpen = target.style.display === "flex";
   closeSidebars();
-
   if (!isOpen) {
     target.style.display = "flex";
     if (id === "projectsSidebar") await renderProjectList();
@@ -483,26 +940,21 @@ function closeSidebars() {
   document.getElementById("toolsSidebar").style.display = "none";
 }
 
-// Proje Listeleme ve Seçim
 async function renderProjectList() {
   const listEl = document.getElementById("projectList");
   listEl.innerHTML = "";
   const projects = await getProjects();
-
   for (let name in projects) {
     const li = document.createElement("li");
     if (name === selectedProject) li.className = "selected";
-
     const titleSpan = document.createElement("span");
     titleSpan.textContent = name;
     titleSpan.style.flex = "1";
     titleSpan.onclick = () => selectProject(name);
-
     const delBtn = document.createElement("button");
     delBtn.className = "del-proj";
     delBtn.textContent = "✕";
     delBtn.onclick = (e) => { e.stopPropagation(); deleteProject(name); };
-
     li.appendChild(titleSpan);
     li.appendChild(delBtn);
     listEl.appendChild(li);
@@ -513,7 +965,16 @@ async function selectProject(name) {
   selectedProject = name;
   const projects = await getProjects();
   if (projects[name]) {
-    editor.setValue(projects[name].code || "");
+    projectData = projects[name];
+    if (!projectData.tree) {
+      projectData.tree = {
+        "index.html": { type: "file", content: projectData.html || "" },
+        "style.css": { type: "file", content: projectData.css || "" },
+        "script.js": { type: "file", content: projectData.js || "" }
+      };
+    }
+    openTabs = ["index.html"];
+    switchTab("index.html");
     document.getElementById("projectTitleDisplay").textContent = name;
     document.getElementById("toolsHeaderTitle").textContent = name + " - Araçlar";
     await renderProjectFiles();
@@ -524,35 +985,33 @@ async function selectProject(name) {
 }
 
 async function saveProject() {
-  if (!selectedProject) {
-    initSaveAsProject();
-    return;
+  if (activeFilePath) {
+    const activeNode = getNodeByPath(activeFilePath);
+    if (activeNode) activeNode.content = editor.getValue();
   }
+  if (!selectedProject) { initSaveAsProject(); return; }
   const projects = await getProjects();
-  projects[selectedProject].code = editor.getValue();
+  projects[selectedProject] = projectData;
   await setProjects(projects);
-  logToConsole(`"${selectedProject}" projesi kaydedildi.`, "success");
+  logToConsole(`"${selectedProject}" mimarisi kaydedildi.`, "success");
 }
 
 function initSaveAsProject() {
+  if (activeFilePath) {
+    const activeNode = getNodeByPath(activeFilePath);
+    if (activeNode) activeNode.content = editor.getValue();
+  }
   const defaultName = selectedProject ? selectedProject + "_kopya" : "Yeni_Proje";
   requestConsoleInput("Proje Ismi:", defaultName, async (name) => {
-    if (!name) {
-      logToConsole("Proje kaydetme işlemi iptal edildi.", "warn");
-      return;
-    }
-
+    if (!name) return;
     const projects = await getProjects();
-    const currentFiles = selectedProject && projects[selectedProject] ? projects[selectedProject].files : {};
-
-    projects[name] = { code: editor.getValue(), files: currentFiles || {}, notes: "" };
-
+    projects[name] = JSON.parse(JSON.stringify(projectData));
     await setProjects(projects);
     selectedProject = name;
     document.getElementById("projectTitleDisplay").textContent = name;
     document.getElementById("toolsHeaderTitle").textContent = name + " - Araçlar";
     await renderProjectFiles();
-    logToConsole(`"${name}" projesi oluşturuldu ve kaydedildi.`, "success");
+    logToConsole(`"${name}" projesi kaydedildi.`, "success");
   });
 }
 
@@ -562,55 +1021,50 @@ async function deleteProject(name) {
       const projects = await getProjects();
       delete projects[name];
       await setProjects(projects);
-
       if (selectedProject === name) {
         selectedProject = null;
         document.getElementById("projectTitleDisplay").textContent = "Proje: Seçilmedi";
-        editor.setValue("");
-        await renderProjectFiles();
-        await runCode();
       }
       await renderProjectList();
       logToConsole(`"${name}" projesi silindi.`, "warn");
-    } else {
-      logToConsole("Silme işlemi iptal edildi.", "info");
     }
   });
 }
 
-// Otomatik Kayıt
 let saveTimeout;
 editor.on("change", () => {
+  if (activeFilePath) {
+    const activeNode = getNodeByPath(activeFilePath);
+    if (activeNode) activeNode.content = editor.getValue();
+  }
   if (selectedProject) {
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(async () => {
       const projects = await getProjects();
       if (projects[selectedProject]) {
-        projects[selectedProject].code = editor.getValue();
+        projects[selectedProject] = projectData;
         await setProjects(projects);
       }
     }, 400);
   }
 });
 
-// Not Defteri
 async function openNotepadModal() {
   if (!selectedProject) { logToConsole("Lütfen önce bir proje seçin.", "error"); return; }
-  const projects = await getProjects();
-  document.getElementById("notepadTextarea").value = projects[selectedProject].notes || "";
+  document.getElementById("notepadTextarea").value = projectData.notes || "";
   document.getElementById("notepadModal").style.display = "flex";
 }
 function closeNotepadModal() { document.getElementById("notepadModal").style.display = "none"; }
 async function saveNotepad() {
   if (!selectedProject) return;
+  projectData.notes = document.getElementById("notepadTextarea").value;
   const projects = await getProjects();
-  projects[selectedProject].notes = document.getElementById("notepadTextarea").value;
+  projects[selectedProject] = projectData;
   await setProjects(projects);
   closeNotepadModal();
   logToConsole("Notlar kaydedildi.", "success");
 }
 
-// Sürükle & Bırak Yönetimi
 const dropZone = document.getElementById("dropZone");
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); }));
 ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, () => dropZone.classList.add('dragover')));
@@ -629,13 +1083,14 @@ function handleFileUpload(file) {
   if (!selectedProject) { logToConsole("Lütfen önce bir proje seçin.", "error"); return; }
   const reader = new FileReader();
   reader.onload = async function(e) {
+    if (!projectData.files) projectData.files = {};
+    projectData.files[file.name] = e.target.result;
     const projects = await getProjects();
-    if (!projects[selectedProject].files) projects[selectedProject].files = {};
-    projects[selectedProject].files[file.name] = e.target.result;
+    projects[selectedProject] = projectData;
     await setProjects(projects);
     await renderProjectFiles();
     await runCode();
-    logToConsole(`"${file.name}" dosyası yüklendi.`, "success");
+    logToConsole(`"${file.name}" eklendi.`, "success");
   };
   reader.readAsDataURL(file);
 }
@@ -644,41 +1099,60 @@ async function renderProjectFiles() {
   const container = document.getElementById("activeProjectFiles");
   container.innerHTML = "";
   if (!selectedProject) return;
-
-  const projects = await getProjects();
-  const files = projects[selectedProject]?.files || {};
-
+  const files = projectData.files || {};
   for (let fname in files) {
     const chip = document.createElement("div");
     chip.className = "file-chip";
-    chip.innerHTML = `<span>${fname}</span><button class="del-btn" onclick="removeFileFromProject('${fname}')">✕</button>`;
+    chip.innerHTML = `<span>🖼️ ${fname}</span><button class="del-btn" onclick="removeFileFromProject('${fname}')">✕</button>`;
     container.appendChild(chip);
   }
 }
 
 async function removeFileFromProject(fileName) {
   if (!selectedProject) return;
-  const projects = await getProjects();
-  if (projects[selectedProject]?.files?.[fileName]) {
-    delete projects[selectedProject].files[fileName];
+  if (projectData.files && projectData.files[fileName]) {
+    delete projectData.files[fileName];
+    const projects = await getProjects();
+    projects[selectedProject] = projectData;
     await setProjects(projects);
     await renderProjectFiles();
     await runCode();
-    logToConsole(`"${fileName}" dosyası kaldırıldı.`, "warn");
+    logToConsole(`"${fileName}" kaldırıldı.`, "warn");
   }
 }
 
-// Kod Çalıştırma & Önizleme Konsol Dinleyici Entegrasyonu
 async function runCode() {
-  let code = editor.getValue();
-  if (selectedProject) {
-    const projects = await getProjects();
-    const files = projects[selectedProject]?.files;
-    if (files) {
-      for (let fname in files) {
-        const regex = new RegExp(`(["'])${fname}\\1`, "g");
-        code = code.replace(regex, `"${files[fname]}"`);
+  if (activeFilePath) {
+    const activeNode = getNodeByPath(activeFilePath);
+    if (activeNode) activeNode.content = editor.getValue();
+  }
+
+  let mergedCSS = "";
+  let mergedJS = "";
+  let mainHTML = "<h1>index.html bulunamadı!</h1>";
+
+  function traverseAndBundle(treeObj) {
+    for (let name in treeObj) {
+      const node = treeObj[name];
+      if (node.type === "folder" && node.children) {
+        traverseAndBundle(node.children);
+      } else if (node.type === "file") {
+        if (name.endsWith(".css")) mergedCSS += `\n/* --- ${name} --- */\n` + (node.content || "");
+        else if (name.endsWith(".js")) mergedJS += `\n// --- ${name} ---\n` + (node.content || "");
+        else if (name === "index.html") mainHTML = node.content || "";
       }
+    }
+  }
+
+  traverseAndBundle(projectData.tree);
+
+  const files = projectData.files;
+  if (files) {
+    for (let fname in files) {
+      const regex = new RegExp(`(["'])${fname}\\1`, "g");
+      mainHTML = mainHTML.replace(regex, `"${files[fname]}"`);
+      mergedCSS = mergedCSS.replace(regex, `"${files[fname]}"`);
+      mergedJS = mergedJS.replace(regex, `"${files[fname]}"`);
     }
   }
 
@@ -696,8 +1170,25 @@ async function runCode() {
     <\/script>
   `;
 
-  document.getElementById("preview").srcdoc = consoleScript + code;
-  logToConsole("Kod çalıştırıldı.", "info");
+  const fullDocument = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      ${consoleScript}
+      <style>${mergedCSS}</style>
+    </head>
+    <body>
+      ${mainHTML}
+      <script>
+        try { ${mergedJS} } catch(err) { console.error(err.message); }
+      <\/script>
+    </body>
+    </html>
+  `;
+
+  document.getElementById("preview").srcdoc = fullDocument;
+  logToConsole("Dinamik proje derlendi.", "info");
 }
 
 window.addEventListener("message", (e) => {
@@ -706,19 +1197,74 @@ window.addEventListener("message", (e) => {
   }
 });
 
-function clearCode() {
-  editor.setValue('');
-  document.getElementById("preview").srcdoc = '';
-  logToConsole("Kod alanı temizlendi.", "info");
-}
+function clearCode() { editor.setValue(''); logToConsole("Kod alanı temizlendi.", "info"); }
 
 function saveCode() {
-  const blob = new Blob([editor.getValue()], {type:'text/html'});
+  runCode();
+  const blob = new Blob([document.getElementById("preview").srcdoc], {type:'text/html'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = (selectedProject || 'index') + '.html';
   a.click();
-  logToConsole("HTML dosyası indirildi.", "success");
+  logToConsole("Derlenmiş HTML indirildi.", "success");
+}
+
+function promptFolderAddChoice(parentPath) {
+  requestConsoleInput(`"${parentPath}" içine ne eklemek istersiniz? (1: Dosya, 2: Klasör):`, "1", (choice) => {
+    if (choice === "1") promptCreateFile(parentPath);
+    else if (choice === "2") promptCreateFolder(parentPath);
+  });
+}
+
+function promptCreateFile(parentPath = "") {
+  requestConsoleInput("Yeni Dosya Adı (Örn: utils.js):", "", (fileName) => {
+    if (!fileName) return;
+    let targetObj = projectData.tree;
+    if (parentPath) {
+      const parentNode = getNodeByPath(parentPath);
+      if (parentNode && parentNode.type === "folder") {
+        if (!parentNode.children) parentNode.children = {};
+        targetObj = parentNode.children;
+      }
+    }
+    if (targetObj[fileName]) { logToConsole("Bu isimde bir dosya zaten var.", "error"); return; }
+    targetObj[fileName] = { type: "file", content: `// ${fileName}` };
+    const newPath = parentPath ? `${parentPath}/${fileName}` : fileName;
+    switchTab(newPath);
+    logToConsole(`"${newPath}" dosyası oluşturuldu.`, "success");
+  });
+}
+
+function promptCreateFolder(parentPath = "") {
+  requestConsoleInput("Yeni Klasör Adı (Örn: components):", "", (folderName) => {
+    if (!folderName) return;
+    let targetObj = projectData.tree;
+    if (parentPath) {
+      const parentNode = getNodeByPath(parentPath);
+      if (parentNode && parentNode.type === "folder") {
+        if (!parentNode.children) parentNode.children = {};
+        targetObj = parentNode.children;
+      }
+    }
+    if (targetObj[folderName]) { logToConsole("Bu isimde bir klasör zaten var.", "error"); return; }
+    targetObj[folderName] = { type: "folder", children: {} };
+    renderFileTree();
+    logToConsole(`"${folderName}" klasörü oluşturuldu.`, "success");
+  });
+}
+
+function deleteNode(path) {
+  requestConsoleInput(`"${path}" silinsin mi? (Evet/Hayır):`, "Evet", (ans) => {
+    if (ans.toLowerCase() === "evet" || ans.toLowerCase() === "e") {
+      const parts = path.split("/").filter(Boolean);
+      let curr = projectData.tree;
+      for (let i = 0; i < parts.length - 1; i++) curr = curr[parts[i]].children;
+      delete curr[parts[parts.length - 1]];
+      closeTab(path);
+      renderFileTree();
+      logToConsole(`"${path}" silindi.`, "warn");
+    }
+  });
 }
 
 function openFile(e) {
@@ -726,19 +1272,17 @@ function openFile(e) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    editor.setValue(e.target.result);
+    projectData.tree[file.name] = { type: "file", content: e.target.result };
+    switchTab(file.name);
     runCode();
-    logToConsole(`"${file.name}" açıldı.`, "info");
+    logToConsole(`"${file.name}" eklendi.`, "info");
   };
   reader.readAsText(file);
 }
 
-// Görünüm & Dinamik Logo Değişimi
 function toggleDarkMode() {
   const isDark = document.body.classList.toggle("dark");
   editor.setOption("theme", isDark ? "dracula" : "default");
-  
-  // Tema durumuna göre logo güncellemesi
   const logoImg = document.getElementById("siteLogo");
   logoImg.src = isDark ? "ondayelectronicslogo1.png" : "ondayelectronicslogo2.png";
 }
@@ -749,6 +1293,10 @@ function toggleEditor() {
   ed.style.display = ed.style.display === "none" ? "flex" : "none";
   prev.style.width = ed.style.display === "none" ? "100%" : "50%";
 }
+
+// Başlat
+initCanvasInteractions();
+switchTab("index.html");
 </script>
 
 </body>
