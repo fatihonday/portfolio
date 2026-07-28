@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini HTML Editör</title>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/dracula.min.css">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="topBar">
+    <a href="https://ondayelectronics.com" class="logo-link" title="ondayelectronics.com">
+      <img id="siteLogo" src="ondayelectronicslogo2.png" alt="Onday Electronics Logo" onerror="this.style.display='none'">
+    </a>
+
+    <button class="btn-plain" id="btnToggleProjects">Projeler</button>
+    <div class="v-divider"></div>
+    <button class="project-name-btn" id="projectTitleDisplay">Proje: Seçilmedi</button>
+    <div class="v-divider"></div>
+
+    <button class="btn-plain" id="btnOpenFile">Dosya Aç</button>
+    <div class="v-divider"></div>
+
+    <button class="btn-plain" id="btnToggleTheme">Tema</button>
+    <button class="btn-plain" id="btnToggleEditor">Kod Alanı</button>
+    <button class="btn-plain" id="consoleToggleBtn">Console</button>
+
+    <a href="mailto:ondayfatih@gmail.com" class="email-link">ondayfatih@gmail.com</a>
+  </div>
+
+  <div id="mainContainer">
+    <div id="workspaceWrapper">
+      
+      <div class="sidebar-panel" id="projectsSidebar">
+        <div class="sidebar-header">
+          <span>Kayıtlı Projeler</span>
+          <span class="close-sidebar-btn" style="cursor:pointer;">✕</span>
+        </div>
+        <ul id="projectList"></ul>
+      </div>
+
+      <div class="sidebar-panel" id="toolsSidebar">
+        <div class="sidebar-header">
+          <span id="toolsHeaderTitle">Proje Araçları</span>
+          <span class="close-sidebar-btn" style="cursor:pointer;">✕</span>
+        </div>
+
+        <button class="tool-item" id="btnSaveProject">Kaydet</button>
+        <button class="tool-item" id="btnSaveAsProject">Farklı Kaydet</button>
+        <button class="tool-item" id="btnRunCode">Çalıştır</button>
+        <button class="tool-item" id="btnClearCode">Temizle</button>
+        <button class="tool-item" id="btnDownloadHtml">HTML İndir</button>
+        <button class="tool-item" id="btnOpenNotepad">Not Defteri</button>
+
+        <div class="section-label">PROJE MİMARİSİ</div>
+        <div class="tree-toolbar">
+          <button class="tree-btn" id="btnAddFile">+ Dosya</button>
+          <button class="tree-btn" id="btnAddFolder">+ Klasör</button>
+          <button class="tree-btn" id="btnOpenSchema">📐 Şema</button>
+        </div>
+
+        <div id="fileTreeContainer"></div>
+
+        <div class="section-label">VARLIKLAR (ASSETS)</div>
+        <div id="activeProjectFiles"></div>
+
+        <div id="dropZone">Dosya Bırak veya Seç</div>
+      </div>
+
+      <div id="mainWorkspace">
+        <div id="editor">
+          <div id="editorTabs"></div>
+          <textarea id="code"></textarea>
+        </div>
+        <iframe id="preview"></iframe>
+      </div>
+    </div>
+
+    <div id="consoleBar">
+      <div class="console-header">
+        <span class="console-header-title">Console / Bildirim Paneli</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <span class="console-btn-icon" id="btnClearConsoleLogs" title="Temizle">🧹 Temizle</span>
+          <span class="console-btn-icon" id="consoleMinMaxBtn" title="Aşağı/Yukarı Daralt">▼</span>
+          <span class="console-btn-icon" id="btnCloseConsole" title="Kapat">✕</span>
+        </div>
+      </div>
+      <div id="consoleLogs"></div>
+      
+      <div id="consoleInputArea">
+        <span id="consoleInputLabel">Girdi:</span>
+        <input type="text" id="consoleInput" placeholder="Değer girin...">
+        <button id="consoleInputBtn">Tamam</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="notepadModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>Proje Not Defteri</span>
+        <span class="close-modal-btn" style="cursor:pointer;">✕</span>
+      </div>
+      <div class="modal-body">
+        <textarea id="notepadTextarea" placeholder="Notlarınızı yazın..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-plain" style="border:1px solid #ccc;" id="btnSaveNotepad">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="schemaModal">
+    <div class="modal-box" style="width: 850px;">
+      <div class="modal-header">
+        <span>Yatay Ağaç Şeması (Soldan Sağa)</span>
+        <span class="close-modal-btn" style="cursor:pointer;">✕</span>
+      </div>
+      <div class="modal-body" style="padding:0;">
+        <div id="schemaCanvasContainer">
+          <button class="schema-reset-btn" id="btnResetCanvas">Görünümü Sıfırla</button>
+          <div id="schemaViewport">
+            <svg id="connectionsLayer" class="connections-layer"></svg>
+            <div id="nodesLayer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-plain close-modal-btn" style="border:1px solid #ccc;">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="fileInput" style="display:none;">
+  <input type="file" id="fileUpload" style="display:none;">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+
+  <script src="js/core/state.js"></script>
+  <script src="js/core/storage.js"></script>
+  <script src="js/components/console.js"></script>
+  <script src="js/components/fileTree.js"></script>
+  <script src="js/components/editor.js"></script>
+  <script src="js/components/schemaCanvas.js"></script>
+  <script src="js/services/bundler.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
