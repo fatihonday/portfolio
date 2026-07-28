@@ -158,19 +158,55 @@ body.dark .tree-btn { background: #2d2d2d; border-color: #444; color: #ccc; }
 .tree-btn:hover { background: #e0e0e0; }
 body.dark .tree-btn:hover { background: #383838; }
 
-#fileTreeContainer { flex: 1; overflow-y: auto; padding: 4px 0; }
+#fileTreeContainer { flex: 1; overflow-y: auto; padding: 2px 0; }
 .tree-node { font-size: 11px; font-family: monospace; user-select: none; }
-.tree-row { display: flex; align-items: center; justify-content: space-between; padding: 3px 8px; cursor: pointer; color: #444; }
+
+.tree-row { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  padding: 2px 6px; 
+  font-size: 11px;
+  height: 22px;
+  cursor: pointer; 
+  color: #444; 
+  user-select: none;
+  transition: background 0.15s ease;
+}
 body.dark .tree-row { color: #bbb; }
 .tree-row:hover { background: #e0e0e0; }
 body.dark .tree-row:hover { background: #2a2d2e; }
-.tree-row.active { font-weight: bold; color: #007acc; background: rgba(0,122,204,0.1); }
-body.dark .tree-row.active { color: #75beff; background: rgba(117,190,255,0.1); }
-.tree-row .node-actions { opacity: 0; display: flex; gap: 4px; }
+
+/* Seçili Öğe Vurgusu */
+.tree-row.selected {
+  background: #007acc !important;
+  color: #fff !important;
+}
+body.dark .tree-row.selected {
+  background: #0e639c !important;
+  color: #fff !important;
+}
+
+.tree-row.active:not(.selected) { font-weight: bold; color: #007acc; background: rgba(0,122,204,0.1); }
+body.dark .tree-row.active:not(.selected) { color: #75beff; background: rgba(117,190,255,0.1); }
+
+.tree-row .node-actions { opacity: 0; display: flex; gap: 2px; align-items: center; }
 .tree-row:hover .node-actions { opacity: 1; }
-.node-btn { background: none; border: none; font-size: 10px; color: #888; cursor: pointer; padding: 0 2px; }
-.node-btn:hover { color: #e74c3c; }
-.tree-children { padding-left: 14px; }
+
+.node-btn { 
+  background: none; 
+  border: none; 
+  font-size: 11px; 
+  color: #777; 
+  cursor: pointer; 
+  padding: 0 3px; 
+  line-height: 1;
+}
+.tree-row.selected .node-btn { color: #eee; }
+.node-btn:hover { color: #007acc; }
+.node-btn.del-btn:hover { color: #e74c3c; }
+
+.tree-children { padding-left: 10px; }
 
 #activeProjectFiles { display: flex; flex-direction: column; gap: 4px; padding: 4px 10px; max-height: 90px; overflow-y: auto; }
 .file-chip { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #ccc; padding: 2px 6px; border-radius: 2px; font-size: 11px; }
@@ -184,7 +220,6 @@ body.dark #dropZone { color: #aaa; border-color: #555; }
 
 #mainWorkspace { flex: 1; display: flex; height: 100%; overflow: hidden; }
 
-/* Editör alanı: min-width: 0 ile genişleme kontrolü */
 #editor { 
   flex: 1; 
   height: 100%; 
@@ -195,7 +230,6 @@ body.dark #dropZone { color: #aaa; border-color: #555; }
 }
 body.dark #editor { border-color: #383838; }
 
-/* Sekmeler barı: Yatay kaydırma var ama scrollbar tamamen gizli */
 #editorTabs { 
   height: 28px; 
   background: #e1e1e1; 
@@ -209,14 +243,13 @@ body.dark #editor { border-color: #383838; }
   white-space: nowrap;
   min-width: 0;
   
-  /* Scrollbar gizleme stilleri */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE / Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 body.dark #editorTabs { background: #2d2d2d; border-color: #383838; }
 
 #editorTabs::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }
 
 .tab-item { 
@@ -255,9 +288,9 @@ body.dark .tab-item.active { background: #1e1e1e; color: #fff; border-bottom-col
   z-index: 20;
   transition: height 0.2s ease-in-out;
 }
+
 #consoleBar.minimized { height: 54px !important; }
-#consoleBar.minimized #consoleInputArea { display: none !important; }
-#consoleBar.minimized #consoleLogs { padding: 2px 6px; overflow: hidden; }
+#consoleBar.minimized #consoleLogs { padding: 2px 6px; overflow: hidden; display: flex !important; }
 #consoleBar.minimized #consoleLogs .log-line { display: none; }
 #consoleBar.minimized #consoleLogs .log-line:last-child { display: flex !important; }
 
