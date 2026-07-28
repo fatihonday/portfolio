@@ -306,7 +306,7 @@ function toggleDarkMode() {
   const isDark = document.body.classList.toggle("dark");
   editor.setOption("theme", isDark ? "dracula" : "default");
   const logoImg = document.getElementById("siteLogo");
-  logoImg.src = isDark ? "ondayelectronicslogo1.png" : "ondayelectronicslogo2.png";
+  logoImg.src = isDark ? "assets/ondayelectronicslogo1.png" : "assets/ondayelectronicslogo2.png";
 }
 
 function toggleEditor() {
