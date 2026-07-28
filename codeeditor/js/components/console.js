@@ -44,20 +44,16 @@ function clearConsoleLogs() {
 
 function requestConsoleInput(label, defaultValue, callback) {
   toggleConsoleBar(true);
-  
-  const consoleBar = document.getElementById("consoleBar");
-  if (consoleBar.classList.contains("minimized")) {
-    consoleBar.classList.remove("minimized");
-    document.getElementById("consoleMinMaxBtn").textContent = "▼";
-  }
 
   const inputArea = document.getElementById("consoleInputArea");
   const inputEl = document.getElementById("consoleInput");
   const labelEl = document.getElementById("consoleInputLabel");
+  
   labelEl.textContent = label;
   inputEl.value = defaultValue || "";
   inputArea.style.display = "flex";
   inputEl.focus();
+  
   consoleCallback = callback;
 }
 
@@ -65,7 +61,11 @@ function submitConsoleInput() {
   const inputArea = document.getElementById("consoleInputArea");
   const inputEl = document.getElementById("consoleInput");
   const val = inputEl.value.trim();
+  
+  // Girdi alanını kapatıyoruz
   inputArea.style.display = "none";
+  inputEl.value = "";
+  
   if (consoleCallback) {
     const cb = consoleCallback;
     consoleCallback = null;
