@@ -4,8 +4,9 @@
 const state = {
   selectedProject: null,
   activeFilePath: null,
-  selectedNodes: [], // Çoklu seçim için seçili dosya/klasör path'leri dizisi
+  selectedNodes: [],
   openTabs: [],
+  isDirty: false, // Kaydedilmeyen değişiklik takibi
   projectData: {
     tree: {},
     files: {},
@@ -14,26 +15,33 @@ const state = {
 };
 
 /**
- * Sanal ağaç üzerinde dosya yoluna (path) göre düğüm bulma
+ * Sanal Ağaç Üzerinde Yola (Path) Göre Düğüm Getirme
  */
 function getNodeByPath(path) {
-  if (!path) return null;
+  if (!path || !state.projectData || !state.projectData.tree) return null;
   const parts = path.split("/");
   let current = state.projectData.tree;
-  
+
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
-    if (!current || !current[part]) return null;
+    if (!current[part]) return null;
     if (i === parts.length - 1) return current[part];
-    current = current[part].children;
+    if (current[part].type === "folder") {
+      current = current[part].children;
+    } else {
+      return null;
+    }
   }
   return null;
 }
 
 /**
- * Sanal ağaca yeni dosya veya klasör ekleme
+ * Sanal Ağaçta Yola Göre Düğüm Oluşturma
  */
 function createNodeByPath(path, type = "file", content = "") {
+  if (!path || !state.projectData) return false;
+  if (!state.projectData.tree) state.projectData.tree = {};
+
   const parts = path.split("/");
   let current = state.projectData.tree;
 
@@ -43,7 +51,7 @@ function createNodeByPath(path, type = "file", content = "") {
 
     if (isLast) {
       if (type === "folder") {
-        current[part] = current[part] || { type: "folder", children: {} };
+        current[part] = { type: "folder", children: current[part]?.children || {} };
       } else {
         current[part] = { type: "file", content: content };
       }
@@ -51,198 +59,154 @@ function createNodeByPath(path, type = "file", content = "") {
       if (!current[part] || current[part].type !== "folder") {
         current[part] = { type: "folder", children: {} };
       }
-      if (!current[part].children) {
-        current[part].children = {};
-      }
       current = current[part].children;
     }
   }
+  return true;
 }
 
 /**
- * Sanal ağaçtan dosya veya klasör silme
+ * Sanal Ağaçtan Yola Göre Düğüm Silme
  */
 function deleteNodeByPath(path) {
+  if (!path || !state.projectData || !state.projectData.tree) return false;
   const parts = path.split("/");
-  const fileName = parts.pop();
   let current = state.projectData.tree;
 
-  for (let part of parts) {
-    if (!current[part] || !current[part].children) return;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const part = parts[i];
+    if (!current[part] || current[part].type !== "folder") return false;
     current = current[part].children;
   }
 
-  delete current[fileName];
+  const lastPart = parts[parts.length - 1];
+  if (current[lastPart]) {
+    delete current[lastPart];
+    return true;
+  }
+  return false;
 }
 
 /**
- * Dosya veya Klasörü Yeniden Adlandırma
+ * Düğüm Yeniden Adlandırma
  */
 function renameNode(oldPath, newName) {
-  if (!oldPath || !newName) return false;
+  const node = getNodeByPath(oldPath);
+  if (!node) return false;
+
   const parts = oldPath.split("/");
-  const oldName = parts.pop();
-  if (oldName === newName) return false;
-
+  parts.pop();
   const parentPath = parts.join("/");
-  let parentObj = state.projectData.tree;
-  if (parentPath) {
-    const parentNode = getNodeByPath(parentPath);
-    if (parentNode && parentNode.children) parentObj = parentNode.children;
-  }
-
-  if (parentObj[newName]) {
-    logToConsole(`"${newName}" adında bir öğe zaten var.`, "warn");
-    return false;
-  }
-
-  const targetNode = parentObj[oldName];
-  delete parentObj[oldName];
-  parentObj[newName] = targetNode;
-
   const newPath = parentPath ? `${parentPath}/${newName}` : newName;
 
-  // Açık sekmeleri güncelle
-  state.openTabs = state.openTabs.map(p => {
-    if (p === oldPath) return newPath;
-    if (p.startsWith(oldPath + "/")) return p.replace(oldPath, newPath);
-    return p;
-  });
+  if (getNodeByPath(newPath)) return false; // Aynı isimde dosya var
 
-  if (state.activeFilePath) {
-    if (state.activeFilePath === oldPath) state.activeFilePath = newPath;
-    else if (state.activeFilePath.startsWith(oldPath + "/")) {
-      state.activeFilePath = state.activeFilePath.replace(oldPath, newPath);
-    }
+  deleteNodeByPath(oldPath);
+  
+  if (node.type === "file") {
+    createNodeByPath(newPath, "file", node.content);
+  } else {
+    createNodeByPath(newPath, "folder");
+    const newNode = getNodeByPath(newPath);
+    newNode.children = node.children;
   }
+
+  // Açık sekmeleri ve aktif yolu güncelle
+  state.openTabs = state.openTabs.map(p => p === oldPath ? newPath : p);
+  if (state.activeFilePath === oldPath) state.activeFilePath = newPath;
 
   return true;
 }
 
 /**
- * Sanal ağaç üzerinde dosya/klasör taşıma işlemi (Mimari taşıma)
+ * Düğüm Taşıma
  */
 function moveNode(srcPath, targetFolderPath) {
-  if (srcPath === targetFolderPath) return false;
-  if (targetFolderPath && targetFolderPath.startsWith(srcPath + "/")) return false;
+  const node = getNodeByPath(srcPath);
+  if (!node) return false;
 
-  const srcParts = srcPath.split("/");
-  const nodeName = srcParts.pop();
-  
-  const parentPath = srcParts.join("/");
-  let parentObj = state.projectData.tree;
-  if (parentPath) {
-    const parentNode = getNodeByPath(parentPath);
-    if (parentNode && parentNode.children) parentObj = parentNode.children;
+  const fileName = srcPath.split("/").pop();
+  const newPath = targetFolderPath ? `${targetFolderPath}/${fileName}` : fileName;
+
+  if (srcPath === newPath) return false;
+  if (getNodeByPath(newPath)) return false;
+
+  deleteNodeByPath(srcPath);
+
+  if (node.type === "file") {
+    createNodeByPath(newPath, "file", node.content);
+  } else {
+    createNodeByPath(newPath, "folder");
+    const newNode = getNodeByPath(newPath);
+    newNode.children = node.children;
   }
 
-  const targetNode = parentObj[nodeName];
-  if (!targetNode) return false;
+  state.openTabs = state.openTabs.map(p => p === srcPath ? newPath : p);
+  if (state.activeFilePath === srcPath) state.activeFilePath = newPath;
 
-  let targetObj = state.projectData.tree;
-  if (targetFolderPath) {
-    const destFolderNode = getNodeByPath(targetFolderPath);
-    if (destFolderNode && destFolderNode.type === "folder") {
-      if (!destFolderNode.children) destFolderNode.children = {};
-      targetObj = destFolderNode.children;
+  return true;
+}
+
+/**
+ * Ağaç Düğüm Sırasını Yukarı / Aşağı Kaydırma
+ */
+function reorderNode(path, direction) {
+  const parts = path.split("/");
+  const nodeName = parts.pop();
+  let parentObj = state.projectData.tree;
+
+  for (let p of parts) {
+    if (parentObj[p] && parentObj[p].type === "folder") {
+      parentObj = parentObj[p].children;
     } else {
       return false;
     }
   }
 
-  if (targetObj[nodeName]) {
-    logToConsole(`"${nodeName}" zaten bu hedefte var.`, "warn");
-    return false;
-  }
-
-  delete parentObj[nodeName];
-  targetObj[nodeName] = targetNode;
-
-  const oldPrefix = srcPath;
-  const newPrefix = targetFolderPath ? `${targetFolderPath}/${nodeName}` : nodeName;
-
-  state.openTabs = state.openTabs.map(p => {
-    if (p === oldPrefix) return newPrefix;
-    if (p.startsWith(oldPrefix + "/")) return p.replace(oldPrefix, newPrefix);
-    return p;
-  });
-
-  if (state.activeFilePath) {
-    if (state.activeFilePath === oldPrefix) state.activeFilePath = newPrefix;
-    else if (state.activeFilePath.startsWith(oldPrefix + "/")) {
-      state.activeFilePath = state.activeFilePath.replace(oldPrefix, newPrefix);
-    }
-  }
-
-  return true;
-}
-
-/**
- * Sadece Görünüm/Sıralama Değiştirme (Aşağı/Yukarı Kaydırma)
- * @param {string} path - Kaydırılacak öğenin yolu
- * @param {string} direction - 'up' (yukarı) veya 'down' (aşağı)
- */
-function reorderNode(path, direction) {
-  const parts = path.split("/");
-  const nodeName = parts.pop();
-  const parentPath = parts.join("/");
-
-  let parentObj = state.projectData.tree;
-  if (parentPath) {
-    const parentNode = getNodeByPath(parentPath);
-    if (parentNode && parentNode.children) parentObj = parentNode.children;
-  }
-
   const keys = Object.keys(parentObj);
   const index = keys.indexOf(nodeName);
-
   if (index === -1) return false;
 
-  if (direction === "up" && index > 0) {
-    const temp = keys[index];
-    keys[index] = keys[index - 1];
-    keys[index - 1] = temp;
-  } else if (direction === "down" && index < keys.length - 1) {
-    const temp = keys[index];
-    keys[index] = keys[index + 1];
-    keys[index + 1] = temp;
-  } else {
-    return false; // Sıra değişmedi (en üstte veya en altta)
-  }
+  const targetIndex = direction === "up" ? index - 1 : index + 1;
+  if (targetIndex < 0 || targetIndex >= keys.length) return false;
 
-  // Nesneyi yeni key sırasıyla yeniden oluşturup ebeveyne ata
-  const reorderedObj = {};
-  keys.forEach(k => {
-    reorderedObj[k] = parentObj[k];
+  // Sıralamayı yeniden dizayn et
+  const newKeys = [...keys];
+  const temp = newKeys[index];
+  newKeys[index] = newKeys[targetIndex];
+  newKeys[targetIndex] = temp;
+
+  const newParentObj = {};
+  newKeys.forEach(k => {
+    newParentObj[k] = parentObj[k];
   });
 
-  if (parentPath) {
-    const parentNode = getNodeByPath(parentPath);
-    parentNode.children = reorderedObj;
+  if (parts.length === 0) {
+    state.projectData.tree = newParentObj;
   } else {
-    state.projectData.tree = reorderedObj;
+    let curr = state.projectData.tree;
+    for (let i = 0; i < parts.length - 1; i++) {
+      curr = curr[parts[i]].children;
+    }
+    curr[parts[parts.length - 1]].children = newParentObj;
   }
 
   return true;
 }
 
 /**
- * Projedeki tüm klasörlerin path listesini döndüren yardımcı fonksiyon
+ * Tüm Klasör Yollarını Liste Yapar
  */
-function getAllFolderPaths() {
-  const folders = ["/"]; // Kök dizin
-  
-  function traverse(treeObj, currentPath = "") {
-    for (let name in treeObj) {
-      const node = treeObj[name];
-      if (node.type === "folder") {
-        const fullPath = currentPath ? `${currentPath}/${name}` : name;
-        folders.push(fullPath);
-        if (node.children) traverse(node.children, fullPath);
+function getAllFolderPaths(treeObj = state.projectData.tree, currentPath = "", result = ["/"]) {
+  for (let name in treeObj) {
+    const node = treeObj[name];
+    if (node.type === "folder") {
+      const fullPath = currentPath ? `${currentPath}/${name}` : name;
+      result.push(fullPath);
+      if (node.children) {
+        getAllFolderPaths(node.children, fullPath, result);
       }
     }
   }
-
-  traverse(state.projectData.tree);
-  return folders;
+  return result;
 }

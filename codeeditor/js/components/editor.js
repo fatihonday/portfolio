@@ -16,8 +16,8 @@ function initEditor() {
   if (tabsContainer) {
     tabsContainer.addEventListener("wheel", (e) => {
       if (e.deltaY !== 0) {
-        e.preventDefault(); // Sayfa dikey kaymasını engeller
-        tabsContainer.scrollLeft += e.deltaY; // Fare tekerleğini yatay kaydırmaya aktarır
+        e.preventDefault();
+        tabsContainer.scrollLeft += e.deltaY;
       }
     }, { passive: false });
   }
@@ -32,22 +32,28 @@ function switchTab(path) {
   }
 
   state.activeFilePath = path;
-  if (path && !state.openTabs.includes(path)) state.openTabs.push(path);
+  if (path && !state.openTabs.includes(path)) {
+    state.openTabs.push(path);
+  }
 
   renderTabs();
   renderFileTree();
 
-  const targetNode = getNodeByPath(path);
-  if (targetNode && targetNode.type === "file") {
-    if (path.endsWith(".html")) editor.setOption("mode", "htmlmixed");
-    else if (path.endsWith(".css")) editor.setOption("mode", "css");
-    else if (path.endsWith(".js")) editor.setOption("mode", "javascript");
-    else editor.setOption("mode", "text/plain");
+  if (path) {
+    const targetNode = getNodeByPath(path);
+    if (targetNode && targetNode.type === "file") {
+      if (path.endsWith(".html")) editor.setOption("mode", "htmlmixed");
+      else if (path.endsWith(".css")) editor.setOption("mode", "css");
+      else if (path.endsWith(".js")) editor.setOption("mode", "javascript");
+      else editor.setOption("mode", "text/plain");
 
-    editor.setValue(targetNode.content || "");
+      editor.setValue(targetNode.content || "");
+    }
+  } else {
+    // Açık dosya yoksa editör alanını boşalt
+    if (editor) editor.setValue("");
   }
 
-  // Editörün boyutunu otomatik tazeleyen gecikmeli çağrı
   setTimeout(() => { 
     if (editor) editor.refresh(); 
   }, 10);
@@ -62,7 +68,7 @@ function closeTab(path, event) {
       switchTab(state.openTabs[state.openTabs.length - 1]);
     } else {
       state.activeFilePath = null;
-      editor.setValue("");
+      if (editor) editor.setValue("");
       renderTabs();
       renderFileTree();
     }
@@ -73,6 +79,7 @@ function closeTab(path, event) {
 
 function renderTabs() {
   const container = document.getElementById("editorTabs");
+  if (!container) return;
   container.innerHTML = "";
 
   state.openTabs.forEach(path => {

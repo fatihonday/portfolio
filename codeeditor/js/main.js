@@ -1,13 +1,11 @@
 /**
  * Ana Uygulama Girişi ve Event Listeners
  */
-let saveTimeout;
 
 document.addEventListener("DOMContentLoaded", () => {
   initEditor();
   initCanvasInteractions();
   bindEvents();
-  switchTab("index.html");
 });
 
 function bindEvents() {
@@ -69,21 +67,14 @@ function bindEvents() {
     if (e.dataTransfer.files.length > 0) handleFileUpload(e.dataTransfer.files[0]);
   });
 
-  // Auto Save Handler
+  // Sadece aktif dosyanın bellekteki içeriğini günceller & isDirty takibi yapar
   editor.on("change", () => {
     if (state.activeFilePath) {
       const activeNode = getNodeByPath(state.activeFilePath);
-      if (activeNode) activeNode.content = editor.getValue();
-    }
-    if (state.selectedProject) {
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(async () => {
-        const projects = await getProjects();
-        if (projects[state.selectedProject]) {
-          projects[state.selectedProject] = state.projectData;
-          await setProjects(projects);
-        }
-      }, 400);
+      if (activeNode && activeNode.content !== editor.getValue()) {
+        activeNode.content = editor.getValue();
+        state.isDirty = true;
+      }
     }
   });
 
@@ -137,6 +128,32 @@ async function renderProjectList() {
 }
 
 async function selectProject(name) {
+  if (state.selectedProject === name) {
+    closeSidebars();
+    return;
+  }
+
+  if (state.isDirty) {
+    logToConsole(`⚠️ "${state.selectedProject}" projesinde kaydedilmeyen değişiklikler var!`, "warn");
+    
+    requestConsoleInput(
+      `Kaydedilmeyen değişiklikler var, devam etmek istiyor musunuz? (Evet/Hayır):`,
+      "Hayır",
+      async (ans) => {
+        if (ans.toLowerCase() === "evet" || ans.toLowerCase() === "e") {
+          state.isDirty = false;
+          await loadProjectData(name);
+        } else {
+          logToConsole("Proje geçişi iptal edildi.", "info");
+        }
+      }
+    );
+  } else {
+    await loadProjectData(name);
+  }
+}
+
+async function loadProjectData(name) {
   state.selectedProject = name;
   const projects = await getProjects();
   if (projects[name]) {
@@ -148,14 +165,25 @@ async function selectProject(name) {
         "script.js": { type: "file", content: state.projectData.js || "" }
       };
     }
-    state.openTabs = ["index.html"];
-    switchTab("index.html");
+
+    // Hiçbir sekme veya dosya otomatik açılmasın
+    state.openTabs = [];
+    state.activeFilePath = null;
+    state.isDirty = false;
+
+    if (editor) {
+      editor.setValue(""); // Editörü temizle
+    }
+
+    renderTabs();
+    renderFileTree();
+
     document.getElementById("projectTitleDisplay").textContent = name;
     document.getElementById("toolsHeaderTitle").textContent = name + " - Araçlar";
     await renderProjectFiles();
     runCode();
     closeSidebars();
-    logToConsole(`"${name}" projesi yüklendi.`, "success");
+    logToConsole(`"${name}" projesi yüklendi. Hiçbir dosya açık değil.`, "success");
   }
 }
 
@@ -168,7 +196,9 @@ async function saveProject() {
   const projects = await getProjects();
   projects[state.selectedProject] = state.projectData;
   await setProjects(projects);
-  logToConsole(`"${state.selectedProject}" kaydedildi.`, "success");
+  
+  state.isDirty = false;
+  logToConsole(`"${state.selectedProject}" başarıyla kaydedildi.`, "success");
 }
 
 function initSaveAsProject() {
@@ -183,6 +213,7 @@ function initSaveAsProject() {
     projects[name] = JSON.parse(JSON.stringify(state.projectData));
     await setProjects(projects);
     state.selectedProject = name;
+    state.isDirty = false;
     document.getElementById("projectTitleDisplay").textContent = name;
     document.getElementById("toolsHeaderTitle").textContent = name + " - Araçlar";
     await renderProjectFiles();
@@ -198,6 +229,11 @@ async function deleteProject(name) {
       await setProjects(projects);
       if (state.selectedProject === name) {
         state.selectedProject = null;
+        state.isDirty = false;
+        state.openTabs = [];
+        state.activeFilePath = null;
+        if (editor) editor.setValue("");
+        renderTabs();
         document.getElementById("projectTitleDisplay").textContent = "Proje: Seçilmedi";
       }
       await renderProjectList();
@@ -212,12 +248,10 @@ function handleFileUpload(file) {
   reader.onload = async function(e) {
     if (!state.projectData.files) state.projectData.files = {};
     state.projectData.files[file.name] = e.target.result;
-    const projects = await getProjects();
-    projects[state.selectedProject] = state.projectData;
-    await setProjects(projects);
+    state.isDirty = true;
     await renderProjectFiles();
     runCode();
-    logToConsole(`"${file.name}" yüklendi.`, "success");
+    logToConsole(`"${file.name}" yüklendi (Kaydetmek için Kaydet butonuna basın).`, "info");
   };
   reader.readAsDataURL(file);
 }
@@ -244,12 +278,10 @@ async function removeFileFromProject(fileName) {
   if (!state.selectedProject) return;
   if (state.projectData.files && state.projectData.files[fileName]) {
     delete state.projectData.files[fileName];
-    const projects = await getProjects();
-    projects[state.selectedProject] = state.projectData;
-    await setProjects(projects);
+    state.isDirty = true;
     await renderProjectFiles();
     runCode();
-    logToConsole(`"${fileName}" kaldırıldı.`, "warn");
+    logToConsole(`"${fileName}" kaldırıldı (Kaydetmek için Kaydet butonuna basın).`, "info");
   }
 }
 
@@ -262,11 +294,9 @@ function openNotepadModal() {
 async function saveNotepad() {
   if (!state.selectedProject) return;
   state.projectData.notes = document.getElementById("notepadTextarea").value;
-  const projects = await getProjects();
-  projects[state.selectedProject] = state.projectData;
-  await setProjects(projects);
+  state.isDirty = true;
   document.getElementById("notepadModal").style.display = "none";
-  logToConsole("Notlar kaydedildi.", "success");
+  logToConsole("Notlar güncellendi (Kaydetmek için Projeyi Kaydet butonuna basın).", "info");
 }
 
 function openSchemaModal() {
@@ -276,6 +306,7 @@ function openSchemaModal() {
 
 function clearCode() { 
   editor.setValue(''); 
+  state.isDirty = true;
   logToConsole("Kod alanı temizlendi.", "info"); 
 }
 
@@ -295,6 +326,7 @@ function openFile(e) {
   const reader = new FileReader();
   reader.onload = e => {
     state.projectData.tree[file.name] = { type: "file", content: e.target.result };
+    state.isDirty = true;
     switchTab(file.name);
     runCode();
     logToConsole(`"${file.name}" eklendi.`, "info");

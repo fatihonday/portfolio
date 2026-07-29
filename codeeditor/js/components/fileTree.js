@@ -62,11 +62,11 @@ function renderFileTree() {
         upBtn.className = "node-btn";
         upBtn.textContent = "▲";
         upBtn.title = "Yukarı Taşı";
-        upBtn.onclick = async (e) => {
+        upBtn.onclick = (e) => {
           e.stopPropagation();
           if (reorderNode(fullPath, "up")) {
+            state.isDirty = true;
             renderFileTree();
-            await saveProject();
           }
         };
         actionsDiv.appendChild(upBtn);
@@ -78,11 +78,11 @@ function renderFileTree() {
         downBtn.className = "node-btn";
         downBtn.textContent = "▼";
         downBtn.title = "Aşağı Taşı";
-        downBtn.onclick = async (e) => {
+        downBtn.onclick = (e) => {
           e.stopPropagation();
           if (reorderNode(fullPath, "down")) {
+            state.isDirty = true;
             renderFileTree();
-            await saveProject();
           }
         };
         actionsDiv.appendChild(downBtn);
@@ -125,7 +125,7 @@ function renderFileTree() {
 }
 
 /**
- * Seçilen öğelere göre konsol panelinde işlem seçeneklerini sunar (Sadeleştirildi)
+ * Seçilen öğelere göre konsol panelinde işlem seçeneklerini sunar
  */
 function handleSelectionActions() {
   const count = state.selectedNodes.length;
@@ -164,22 +164,22 @@ function promptRenameNode(path) {
   const parts = path.split("/");
   const currentName = parts.pop();
 
-  requestConsoleInput(`"${currentName}" için yeni isim girin:`, currentName, async (newName) => {
+  requestConsoleInput(`"${currentName}" için yeni isim girin:`, currentName, (newName) => {
     if (!newName || newName === currentName) return;
 
     const success = renameNode(path, newName);
     if (success) {
       state.selectedNodes = [];
+      state.isDirty = true;
       renderFileTree();
       renderTabs();
-      await saveProject();
-      logToConsole(`"${currentName}" -> "${newName}" olarak değiştirildi.`, "success");
+      logToConsole(`"${currentName}" -> "${newName}" olarak değiştirildi.`, "info");
     }
   });
 }
 
 /**
- * Dosya/Klasör Taşıma İşlemi (Klasör Adı/Yolu ile)
+ * Dosya/Klasör Taşıma İşlemi
  */
 function promptMoveNodes(pathsToMove) {
   const folders = getAllFolderPaths();
@@ -189,7 +189,7 @@ function promptMoveNodes(pathsToMove) {
     logToConsole(`  • ${f === "/" ? "/ (Kök Dizin)" : f}`, "info");
   });
 
-  requestConsoleInput(`Hedef klasör adını/yolunu girin (Kök dizin için /):`, "/", async (targetInput) => {
+  requestConsoleInput(`Hedef klasör adını/yolunu girin (Kök dizin için /):`, "/", (targetInput) => {
     if (!targetInput) {
       logToConsole("Taşıma iptal edildi.", "info");
       return;
@@ -222,10 +222,10 @@ function promptMoveNodes(pathsToMove) {
 
     if (movedCount > 0) {
       state.selectedNodes = [];
+      state.isDirty = true;
       renderFileTree();
       renderTabs();
-      await saveProject();
-      logToConsole(`✅ ${movedCount} öğe "${trimmedTarget || '/'}" konumuna taşındı.`, "success");
+      logToConsole(`✅ ${movedCount} öğe "${trimmedTarget || '/'}" konumuna taşındı.`, "info");
     } else {
       logToConsole("Öğeler taşınamadı.", "warn");
     }
@@ -241,11 +241,12 @@ function promptAddIntoFolder(folderPath) {
     if (isFile) {
       createNodeByPath(targetPath, "file", "");
       switchTab(targetPath);
-      logToConsole(`"${targetPath}" dosyası oluşturuldu.`, "success");
+      logToConsole(`"${targetPath}" dosyası oluşturuldu.`, "info");
     } else {
       createNodeByPath(targetPath, "folder");
-      logToConsole(`"${targetPath}" klasörü oluşturuldu.`, "success");
+      logToConsole(`"${targetPath}" klasörü oluşturuldu.`, "info");
     }
+    state.isDirty = true;
     renderFileTree();
   });
 }
@@ -254,9 +255,10 @@ function promptCreateFile() {
   requestConsoleInput("Dosya Adı (Örn: style.css veya components/header.js):", "", (path) => {
     if (!path) return;
     createNodeByPath(path, "file", "");
+    state.isDirty = true;
     renderFileTree();
     switchTab(path);
-    logToConsole(`"${path}" dosyası oluşturuldu.`, "success");
+    logToConsole(`"${path}" dosyası oluşturuldu.`, "info");
   });
 }
 
@@ -264,19 +266,20 @@ function promptCreateFolder() {
   requestConsoleInput("Klasör Adı (Örn: utils veya assets/icons):", "", (path) => {
     if (!path) return;
     createNodeByPath(path, "folder");
+    state.isDirty = true;
     renderFileTree();
-    logToConsole(`"${path}" klasörü oluşturuldu.`, "success");
+    logToConsole(`"${path}" klasörü oluşturuldu.`, "info");
   });
 }
 
 function deleteNodePrompt(path) {
-  requestConsoleInput(`"${path}" silinsin mi? (Evet/Hayır):`, "Evet", async (ans) => {
+  requestConsoleInput(`"${path}" silinsin mi? (Evet/Hayır):`, "Evet", (ans) => {
     if (ans.toLowerCase() === "evet" || ans.toLowerCase() === "e") {
       deleteNodeByPath(path);
       closeTab(path);
       state.selectedNodes = state.selectedNodes.filter(p => p !== path);
+      state.isDirty = true;
       renderFileTree();
-      await saveProject();
       logToConsole(`"${path}" silindi.`, "warn");
     }
   });

@@ -55,6 +55,8 @@ function renderCustomBlockSchema() {
   const nodesContainer = document.getElementById("nodesLayer");
   const svgContainer = document.getElementById("connectionsLayer");
 
+  if (!nodesContainer || !svgContainer) return;
+
   nodesContainer.innerHTML = "";
   svgContainer.innerHTML = "";
 
@@ -97,7 +99,9 @@ function renderCustomBlockSchema() {
   });
 
   currentY += rowGapY;
-  buildHorizontalTree(state.projectData.tree, 1, rootId);
+  if (state.projectData && state.projectData.tree) {
+    buildHorizontalTree(state.projectData.tree, 1, rootId);
+  }
 
   let nodeMap = {};
   nodesList.forEach(n => nodeMap[n.id] = n);
