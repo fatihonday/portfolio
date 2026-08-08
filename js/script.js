@@ -1,23 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // 1. Dinamik Favicon Takipçisi (JS Fallback)
+    // 1. Dinamik Favicon Değiştirici (Light / Dark Mode)
+    const faviconTag = document.getElementById('faviconTag');
+    
     const updateFavicon = () => {
         const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const faviconLight = document.querySelectorAll('link[media="(prefers-color-scheme: light)"]');
-        const faviconDark = document.querySelectorAll('link[media="(prefers-color-scheme: dark)"]');
-
-        if (isDarkMode) {
-            faviconLight.forEach(el => el.remove());
-        } else {
-            faviconDark.forEach(el => el.remove());
+        if (faviconTag) {
+            faviconTag.href = isDarkMode ? 'assets/favicon-dark.png' : 'assets/favicon-light.png';
         }
     };
 
+    // İlk yüklemede çalıştır
+    updateFavicon();
+    
+    // İşletim sistemi / tarayıcı teması değiştiğinde otomatik güncelle
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
     
-    // 2. Güvenlik Engeline (CORS) Takılırsa Gösterilecek Kurtarıcı Biyografi Metinleri
+    // 2. Güvenlik Engeline (CORS/file://) Takılırsa Gösterilecek Kurtarıcı Biyografi Metinleri
     const fallbackBioTexts = {
-        TR: "<p>Balıkesir Üniversitesi Elektrik-Elektronik Mühendisliği mezunuyum. Elektrik proje tasarımı, saha uygulamaları ve elektronik üretim süreçlerinde deneyim kazandım. Elektrik tesisat projelerinin hazırlanması, rölöve ve ataşman çizimlerinin oluşturulması, şantiye koordinasyonu ile birlikte SMD/THT elektronik kart üretimi, Pick and Place otomasyonu, reflow lehimleme süreçleri ve IPC standartlarına uygun PCB üretiminde görev aldım. AutoCAD, KiCad, Dialux ve diğer mühendislik yazılımlarını etkin şekilde kullanıyor; analitik düşünme, teknik dokümantasyon ve disiplinler arası çalışma becerilerimle elektrik ve elektronik alanlarında güvenilir, verimli ve uygulanabilir mühendislik çözümleri üretmeyi hedefliyorum.</p>",
+        TR: "<p>Elektrik-Elektronik Mühendisliği ile müziğin tutkulu kesişim noktasında üreten bir mühendis ve müzisyenim. Müzikal tınıların arkasındaki donanımsal mimariyi, analog ses devrelerini ve efekt sistemlerini kendi mühendislik bakış açımla tasarlayıp hayata geçiriyorum.</p><p>Sadece sesin fiziği ve elektroniğiyle değil; aynı zamanda üretimi kolaylaştıran dijital yazılımlar, interaktif araçlar ve modern web teknolojileri geliştirerek çok yönlü projeler üretmeye devam ediyorum.</p>",
         EN: "<p>I am an Electrical and Electronics Engineer and musician producing at the passionate intersection of engineering and music. I design and build analog audio circuits, effect systems, and hardware architectures behind musical tones from an engineering perspective.</p><p>Beyond the physics and electronics of sound, I develop digital software, interactive tools, and modern web applications to streamline design and production workflows.</p>",
         CN: "<p>我是一名电气与电子工程师兼音乐人，致力于工程与音乐的热情交汇点。我从工程角度设计并开发模拟音频电路、音效系统以及音乐声效背后的硬件架构。</p><p>除了声音物理学和电子学之外，我还开发数字软件、互动工具和现代 Web 应用，以简化设计与生产流程。</p>"
     };
@@ -77,9 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const cvDownloadBtn = document.getElementById('cvDownloadBtn');
     const cvImage = document.getElementById('cvImage');
 
-    // Metin Dosyası Yükleyici
+    // Metin Dosyası Yükleyici (Cache-Busting Eklendi)
     const loadBioText = (filePath, langCode) => {
-        fetch(filePath)
+        // Önbellek sorununu önlemek için zaman damgası ekliyoruz
+        const cacheBusterPath = `${filePath}?v=${new Date().getTime()}`;
+        
+        fetch(cacheBusterPath)
             .then(res => {
                 if (!res.ok) throw new Error("Metin dosyası bulunamadı.");
                 return res.text();
@@ -88,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 bioContent.innerHTML = data;
             })
             .catch(err => {
-                console.warn("Yerel dosya protokolü algılandı. Fallback metin yükleniyor.");
+                console.warn("Dosya okunamadı veya yerel protokol (file://) algılandı. Yedeğe geçiliyor.", err);
                 bioContent.innerHTML = fallbackBioTexts[langCode];
             });
     };
@@ -127,6 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Varsayılan Dili Yükle
     setLanguage('TR');
 
     // 4. Sağ Panel (CV Drawer) Kontrolleri
