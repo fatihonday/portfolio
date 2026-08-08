@@ -1,29 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // 1. Dinamik Favicon Değiştirici (Light / Dark Mode)
-    const faviconTag = document.getElementById('faviconTag');
-    
-    const updateFavicon = () => {
-        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (faviconTag) {
-            faviconTag.href = isDarkMode ? 'assets/favicon-dark.png' : 'assets/favicon-light.png';
-        }
-    };
-
-    // İlk yüklemede çalıştır
-    updateFavicon();
-    
-    // İşletim sistemi / tarayıcı teması değiştiğinde otomatik güncelle
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
-    
-    // 2. Güvenlik Engeline (CORS/file://) Takılırsa Gösterilecek Kurtarıcı Biyografi Metinleri
-    const fallbackBioTexts = {
-        TR: "<p>Elektrik-Elektronik Mühendisliği ile müziğin tutkulu kesişim noktasında üreten bir mühendis ve müzisyenim. Müzikal tınıların arkasındaki donanımsal mimariyi, analog ses devrelerini ve efekt sistemlerini kendi mühendislik bakış açımla tasarlayıp hayata geçiriyorum.</p><p>Sadece sesin fiziği ve elektroniğiyle değil; aynı zamanda üretimi kolaylaştıran dijital yazılımlar, interaktif araçlar ve modern web teknolojileri geliştirerek çok yönlü projeler üretmeye devam ediyorum.</p>",
-        EN: "<p>I am an Electrical and Electronics Engineer and musician producing at the passionate intersection of engineering and music. I design and build analog audio circuits, effect systems, and hardware architectures behind musical tones from an engineering perspective.</p><p>Beyond the physics and electronics of sound, I develop digital software, interactive tools, and modern web applications to streamline design and production workflows.</p>",
-        CN: "<p>我是一名电气与电子工程师兼音乐人，致力于工程与音乐的热情交汇点。我从工程角度设计并开发模拟音频电路、音效系统以及音乐声效背后的硬件架构。</p><p>除了声音物理学和电子学之外，我还开发数字软件、互动工具和现代 Web 应用，以简化设计与生产流程。</p>"
-    };
-
-    // 3. Çoklu Dil Çeviri Sözlüğü
+    // Çoklu Dil Çeviri Sözlüğü
     const translations = {
         TR: {
             engineerText: "Elektrik Elektronik Mühendisi",
@@ -78,22 +55,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const cvDownloadBtn = document.getElementById('cvDownloadBtn');
     const cvImage = document.getElementById('cvImage');
 
-    // Metin Dosyası Yükleyici (Cache-Busting Eklendi)
-    const loadBioText = (filePath, langCode) => {
-        // Önbellek sorununu önlemek için zaman damgası ekliyoruz
+    // Metin Dosyası Yükleyici (Sadece .txt dosyasını okur)
+    const loadBioText = (filePath) => {
+        // Tarayıcı önbelleğini atlamak için zaman damgası ekliyoruz
         const cacheBusterPath = `${filePath}?v=${new Date().getTime()}`;
         
         fetch(cacheBusterPath)
             .then(res => {
-                if (!res.ok) throw new Error("Metin dosyası bulunamadı.");
+                if (!res.ok) throw new Error("Dosya bulunamadı.");
                 return res.text();
             })
             .then(data => {
+                // txt içeriği doğrudan ekrana basılır
                 bioContent.innerHTML = data;
             })
             .catch(err => {
-                console.warn("Dosya okunamadı veya yerel protokol (file://) algılandı. Yedeğe geçiliyor.", err);
-                bioContent.innerHTML = fallbackBioTexts[langCode];
+                // Eğer HTML'ye çift tıklayıp (file:///) girersen bu hata görünür.
+                // Mutlaka Live Server ile açmalısın.
+                console.error("Yükleme Hatası:", err);
+                bioContent.innerHTML = `<p style="color:#ff4444; font-weight:bold;">Metin yüklenemedi. HTML dosyasını Live Server üzerinden açtığınızdan emin olun.</p>`;
             });
     };
 
@@ -114,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
         cvDownloadBtn.setAttribute('download', data.cvPdf.split('/').pop());
         cvImage.src = data.cvJpg;
 
-        loadBioText(data.bioFile, data.langCode);
+        loadBioText(data.bioFile);
 
         langBtns.forEach(btn => {
             if (btn.dataset.lang === lang) {
@@ -134,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Varsayılan Dili Yükle
     setLanguage('TR');
 
-    // 4. Sağ Panel (CV Drawer) Kontrolleri
+    // Sağ Panel (CV Drawer) Kontrolleri
     const cvDrawer = document.getElementById('cvDrawer');
     const hoverZone = document.getElementById('hoverZone');
 
