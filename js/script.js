@@ -1,6 +1,30 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // Çoklu Dil Çeviri Sözlüğü
+    // ==========================================
+    // 1. DİNAMİK FAVİCON KONTROLÜ (KESİN ÇÖZÜM)
+    // ==========================================
+    const faviconElement = document.getElementById('dynamic-favicon');
+    
+    const updateFavicon = () => {
+        if (!faviconElement) return;
+        
+        // İşletim sisteminin temasını kontrol et
+        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // Temaya göre doğru assets dosyasını ata
+        faviconElement.href = isDarkMode ? 'assets/favicon-dark.png' : 'assets/favicon-light.png';
+    };
+
+    // Sayfa ilk yüklendiğinde çalıştır
+    updateFavicon();
+    
+    // İşletim sistemi teması değiştiği an (anlık olarak) çalıştır
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+    
+    // ==========================================
+    // 2. ÇOKLU DİL VE BİYOGRAFİ İÇERİKLERİ
+    // ==========================================
+    // Harici .txt dosyaları iptal edildi. Metinler doğrudan buradan çekilecek.
     const translations = {
         TR: {
             engineerText: "Elektrik Elektronik Mühendisi",
@@ -12,8 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
             bioTitle: "Fatih Önday Kimdir?",
             cvPdf: "assets/001-Fatih-Onday-CV-TR.pdf",
             cvJpg: "assets/001-Fatih-Onday-CV-TR.jpg",
-            bioFile: "content/bio-TR.txt",
-            langCode: "TR"
+            bioHtml: "<p>Elektrik-Elektronik Mühendisliği ile müziğin tutkulu kesişim noktasında üreten bir mühendis ve müzisyenim. Müzikal tınıların arkasındaki donanımsal mimariyi, analog ses devrelerini ve efekt sistemlerini kendi mühendislik bakış açımla tasarlayıp hayata geçiriyorum.</p><p>Sadece sesin fiziği ve elektroniğiyle değil; aynı zamanda üretimi kolaylaştıran dijital yazılımlar, interaktif araçlar ve modern web teknolojileri geliştirerek çok yönlü projeler üretmeye devam ediyorum.</p>"
         },
         EN: {
             engineerText: "Electrical & Electronics Engineer",
@@ -25,8 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
             bioTitle: "Who is Fatih Önday?",
             cvPdf: "assets/001-Fatih-Onday-CV-EN.pdf",
             cvJpg: "assets/001-Fatih-Onday-CV-EN.jpg",
-            bioFile: "content/bio-EN.txt",
-            langCode: "EN"
+            bioHtml: "<p>I am an Electrical and Electronics Engineer and musician producing at the passionate intersection of engineering and music. I design and build analog audio circuits, effect systems, and hardware architectures behind musical tones from an engineering perspective.</p><p>Beyond the physics and electronics of sound, I develop digital software, interactive tools, and modern web applications to streamline design and production workflows.</p>"
         },
         CN: {
             engineerText: "电气与电子工程师",
@@ -38,8 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
             bioTitle: "Fatih Önday 简介",
             cvPdf: "assets/001-Fatih-Onday-CV-CN.pdf",
             cvJpg: "assets/001-Fatih-Onday-CV-CN.jpg",
-            bioFile: "content/bio-CN.txt",
-            langCode: "CN"
+            bioHtml: "<p>我是一名电气与电子工程师兼音乐人，致力于工程与音乐的热情交汇点。我从工程角度设计并开发模拟音频电路、音效系统以及音乐声效背后的硬件架构。</p><p>除了声音物理学和电子学之外，我还开发数字软件、互动工具和现代 Web 应用，以简化设计与生产流程。</p>"
         }
     };
 
@@ -55,33 +76,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const cvDownloadBtn = document.getElementById('cvDownloadBtn');
     const cvImage = document.getElementById('cvImage');
 
-    // Metin Dosyası Yükleyici (Sadece .txt dosyasını okur)
-    const loadBioText = (filePath) => {
-        // Tarayıcı önbelleğini atlamak için zaman damgası ekliyoruz
-        const cacheBusterPath = `${filePath}?v=${new Date().getTime()}`;
-        
-        fetch(cacheBusterPath)
-            .then(res => {
-                if (!res.ok) throw new Error("Dosya bulunamadı.");
-                return res.text();
-            })
-            .then(data => {
-                // txt içeriği doğrudan ekrana basılır
-                bioContent.innerHTML = data;
-            })
-            .catch(err => {
-                // Eğer HTML'ye çift tıklayıp (file:///) girersen bu hata görünür.
-                // Mutlaka Live Server ile açmalısın.
-                console.error("Yükleme Hatası:", err);
-                bioContent.innerHTML = `<p style="color:#ff4444; font-weight:bold;">Metin yüklenemedi. HTML dosyasını Live Server üzerinden açtığınızdan emin olun.</p>`;
-            });
-    };
-
     // Dil Değiştirme Mantığı
     const setLanguage = (lang) => {
         const data = translations[lang];
         if (!data) return;
 
+        // UI Metinlerini Güncelle
         engineerText.innerText = data.engineerText;
         toolsTitle.innerText = data.toolsTitle;
         editorSub.innerText = data.editorSub;
@@ -89,13 +89,16 @@ document.addEventListener("DOMContentLoaded", () => {
         puzzleTitle.innerText = data.puzzleTitle;
         puzzleSub.innerText = data.puzzleSub;
         bioTitle.innerText = data.bioTitle;
+        
+        // Biyografi Metnini JS içinden doğrudan bas
+        bioContent.innerHTML = data.bioHtml;
 
+        // CV Dosyalarını Güncelle
         cvDownloadBtn.href = data.cvPdf;
         cvDownloadBtn.setAttribute('download', data.cvPdf.split('/').pop());
         cvImage.src = data.cvJpg;
 
-        loadBioText(data.bioFile);
-
+        // Aktif Buton CSS'ini Güncelle
         langBtns.forEach(btn => {
             if (btn.dataset.lang === lang) {
                 btn.classList.add('active');
@@ -114,7 +117,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Varsayılan Dili Yükle
     setLanguage('TR');
 
-    // Sağ Panel (CV Drawer) Kontrolleri
+    // ==========================================
+    // 3. SAĞ PANEL (CV DRAWER) KONTROLLERİ
+    // ==========================================
     const cvDrawer = document.getElementById('cvDrawer');
     const hoverZone = document.getElementById('hoverZone');
 
