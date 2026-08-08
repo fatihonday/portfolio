@@ -1,12 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // Güvenlik engeline (CORS) takılırsa gösterilecek kurtarıcı metinler
-    const fallbackBioTexts = {
-        TR: "<p>Elektrik-Elektronik Mühendisliği ile müziğin tutkulu kesişim noktasında üreten bir mühendis ve müzisyenim. Müzikal tınıların arkasındaki donanımsal mimariyi, analog ses devrelerini ve efekt sistemlerini kendi mühendislik bakış açımla tasarlayıp hayata geçiriyorum.</p>",
-        EN: "<p>I am an Electrical and Electronics Engineer and musician producing at the passionate intersection of engineering and music. I design and build analog audio circuits and effect systems.</p>",
-        CN: "<p>我是一名电气与电子工程师兼音乐人，致力于工程与音乐的热情交汇点。我从工程角度设计并开发模拟音频电路、音效系统以及音乐声效背后的硬件架构。</p>"
+    // 1. Dinamik Favicon Takipçisi (JS Fallback)
+    const updateFavicon = () => {
+        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const faviconLight = document.querySelectorAll('link[media="(prefers-color-scheme: light)"]');
+        const faviconDark = document.querySelectorAll('link[media="(prefers-color-scheme: dark)"]');
+
+        if (isDarkMode) {
+            faviconLight.forEach(el => el.remove());
+        } else {
+            faviconDark.forEach(el => el.remove());
+        }
     };
 
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+    
+    // 2. Güvenlik Engeline (CORS) Takılırsa Gösterilecek Kurtarıcı Biyografi Metinleri
+    const fallbackBioTexts = {
+        TR: "<p>Elektrik-Elektronik Mühendisliği ile müziğin tutkulu kesişim noktasında üreten bir mühendis ve müzisyenim. Müzikal tınıların arkasındaki donanımsal mimariyi, analog ses devrelerini ve efekt sistemlerini kendi mühendislik bakış açımla tasarlayıp hayata geçiriyorum.</p><p>Sadece sesin fiziği ve elektroniğiyle değil; aynı zamanda üretimi kolaylaştıran dijital yazılımlar, interaktif araçlar ve modern web teknolojileri geliştirerek çok yönlü projeler üretmeye devam ediyorum.</p>",
+        EN: "<p>I am an Electrical and Electronics Engineer and musician producing at the passionate intersection of engineering and music. I design and build analog audio circuits, effect systems, and hardware architectures behind musical tones from an engineering perspective.</p><p>Beyond the physics and electronics of sound, I develop digital software, interactive tools, and modern web applications to streamline design and production workflows.</p>",
+        CN: "<p>我是一名电气与电子工程师兼音乐人，致力于工程与音乐的热情交汇点。我从工程角度设计并开发模拟音频电路、音效系统以及音乐声效背后的硬件架构。</p><p>除了声音物理学和电子学之外，我还开发数字软件、互动工具和现代 Web 应用，以简化设计与生产流程。</p>"
+    };
+
+    // 3. Çoklu Dil Çeviri Sözlüğü
     const translations = {
         TR: {
             engineerText: "Elektrik Elektronik Mühendisi",
@@ -61,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cvDownloadBtn = document.getElementById('cvDownloadBtn');
     const cvImage = document.getElementById('cvImage');
 
+    // Metin Dosyası Yükleyici
     const loadBioText = (filePath, langCode) => {
         fetch(filePath)
             .then(res => {
@@ -71,11 +88,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 bioContent.innerHTML = data;
             })
             .catch(err => {
-                console.warn("Live Server kullanılmıyor olabilir. Fallback metin yükleniyor.");
+                console.warn("Yerel dosya protokolü algılandı. Fallback metin yükleniyor.");
                 bioContent.innerHTML = fallbackBioTexts[langCode];
             });
     };
 
+    // Dil Değiştirme Mantığı
     const setLanguage = (lang) => {
         const data = translations[lang];
         if (!data) return;
@@ -111,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setLanguage('TR');
 
+    // 4. Sağ Panel (CV Drawer) Kontrolleri
     const cvDrawer = document.getElementById('cvDrawer');
     const hoverZone = document.getElementById('hoverZone');
 
