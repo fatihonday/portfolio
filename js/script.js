@@ -1,30 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
-    // 1. DİNAMİK FAVİCON KONTROLÜ (GitHub Tarzı Anlık Değişim)
+    // 1. ÇOKLU DİL VE BİYOGRAFİ İÇERİKLERİ
     // ==========================================
-    const faviconElement = document.getElementById('dynamic-favicon');
-    
-    const updateFavicon = () => {
-        if (!faviconElement) return;
-        
-        // İşletim sisteminin/tarayıcının karanlık mod tercihini kontrol et
-        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        // Temaya göre ilgili ikon dosyasını anında href'e bas
-        faviconElement.href = isDarkMode ? 'assets/favicon-dark.png' : 'assets/favicon-light.png';
-    };
-
-    // Sayfa ilk yüklendiğinde mevcut temaya göre ikonu ayarla
-    updateFavicon();
-    
-    // Sayfa açıkken işletim sistemi teması değişirse anında tetikle
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
-    
-    // ==========================================
-    // 2. ÇOKLU DİL VE BİYOGRAFİ İÇERİKLERİ
-    // ==========================================
-    // .txt dosyaları güvenlik engeline takıldığı için metinler JS içine geri alındı.
     const translations = {
         TR: {
             engineerText: "Elektrik Elektronik Mühendisi",
@@ -36,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
             bioTitle: "Fatih Önday Kimdir?",
             cvPdf: "assets/001-Fatih-Onday-CV-TR.pdf",
             cvJpg: "assets/001-Fatih-Onday-CV-TR.jpg",
-            // Türkçe Biyografi Metni
             bioHtml: "<p>Elektrik-Elektronik Mühendisliği ile müziğin tutkulu kesişim noktasında üreten bir mühendis ve müzisyenim. Müzikal tınıların arkasındaki donanımsal mimariyi, analog ses devrelerini ve efekt sistemlerini kendi mühendislik bakış açımla tasarlayıp hayata geçiriyorum.</p><p>Sadece sesin fiziği ve elektroniğiyle değil; aynı zamanda üretimi kolaylaştıran dijital yazılımlar, interaktif araçlar ve modern web teknolojileri geliştirerek çok yönlü projeler üretmeye devam ediyorum.</p>"
         },
         EN: {
@@ -49,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
             bioTitle: "Who is Fatih Önday?",
             cvPdf: "assets/001-Fatih-Onday-CV-EN.pdf",
             cvJpg: "assets/001-Fatih-Onday-CV-EN.jpg",
-            // İngilizce Biyografi Metni
             bioHtml: "<p>I am an Electrical and Electronics Engineer and musician producing at the passionate intersection of engineering and music. I design and build analog audio circuits, effect systems, and hardware architectures behind musical tones from an engineering perspective.</p><p>Beyond the physics and electronics of sound, I develop digital software, interactive tools, and modern web applications to streamline design and production workflows.</p>"
         },
         CN: {
@@ -62,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
             bioTitle: "Fatih Önday 简介",
             cvPdf: "assets/001-Fatih-Onday-CV-CN.pdf",
             cvJpg: "assets/001-Fatih-Onday-CV-CN.jpg",
-            // Çince Biyografi Metni
             bioHtml: "<p>我是一名电气与电子工程师兼音乐人，致力于工程与音乐的热情交汇点。我从工程角度设计并开发模拟音频电路、音效系统以及音乐声效背后的硬件架构。</p><p>除了声音物理学和电子学之外，我还开发数字软件、互动工具和现代 Web 应用，以简化设计与生产流程。</p>"
         }
     };
@@ -84,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = translations[lang];
         if (!data) return;
 
+        // UI Metinlerini Güncelle
         engineerText.innerText = data.engineerText;
         toolsTitle.innerText = data.toolsTitle;
         editorSub.innerText = data.editorSub;
@@ -92,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
         puzzleSub.innerText = data.puzzleSub;
         bioTitle.innerText = data.bioTitle;
 
-        // Biyografi Metnini JS içinden doğrudan bas
+        // Biyografi Metnini Bas
         bioContent.innerHTML = data.bioHtml;
 
         // CV Dosya Bağlantılarını Güncelle
@@ -120,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setLanguage('TR');
 
     // ==========================================
-    // 3. SAĞ PANEL (CV DRAWER) KONTROLLERİ
+    // 2. SAĞ PANEL (CV DRAWER) KONTROLLERİ
     // ==========================================
     const cvDrawer = document.getElementById('cvDrawer');
     const hoverZone = document.getElementById('hoverZone');
