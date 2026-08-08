@@ -3,143 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ondayelectronics</title>
+  <title>ondayelectronics | Fatih Önday</title>
 
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
   <link rel="manifest" href="site.webmanifest">
-  <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
 
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      background-image: url("000718.jpg"); 
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: Arial, sans-serif;
-      position: relative;
-      color: white;
-      overflow: hidden;
-    }
-
-    #logo {
-      width: 80%;
-      max-width: 1500px;
-      opacity: 0;
-      animation: fadeIn 3s ease-in-out forwards;
-      animation-delay: 0.5s;
-    }
-
-    .text {
-      position: absolute;
-      width: 100%;
-      text-align: center;
-      font-size: 28px;
-      opacity: 0;
-      animation: fadeIn 2s ease-in-out forwards;
-      padding: 0 10px;
-      box-sizing: border-box;
-    }
-
-    #footerText {
-      bottom: 50px;
-      color: #f2aa4c;
-      animation-delay: 4s;
-    }
-
-    #middleText {
-      top: 100px;
-      font-size: 36px;
-      color: #00aced;
-      animation-delay: 3s;
-    }
-
-    #extraText {
-      bottom: 120px;
-      font-size: 24px;
-      color: #ff4444;
-      animation-delay: 4s;
-    }
-
-    /* Sol alt köşedeki Code Editor linki */
-    #codeEditorLink {
-      position: fixed;
-      left: 20px;
-      bottom: 20px;
-      color: #9b59b6;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: underline;
-      z-index: 1000;
-      transition: color 0.2s;
-    }
-    #codeEditorLink:hover {
-      color: #8e44ad;
-    }
-
-    /* Sağ alt köşedeki Kaydırmalı Yapboz linki */
-    #puzzleLink {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      color: #00aced;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: underline;
-      z-index: 1000;
-      transition: color 0.2s;
-    }
-    #puzzleLink:hover {
-      color: #0096c7;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    /* Mobil uyumluluk */
-    @media (max-width: 768px) {
-      #logo {
-        width: 90%;
-        max-width: 500px;
-      }
-      #middleText { top: 60px; font-size: 24px; }
-      #extraText { bottom: 100px; font-size: 18px; }
-      #footerText { bottom: 40px; font-size: 16px; }
-      #codeEditorLink, #puzzleLink {
-        font-size: 14px;
-        bottom: 10px;
-      }
-      #codeEditorLink { left: 10px; }
-      #puzzleLink { right: 10px; }
-    }
-
-    @media (max-width: 480px) {
-      #middleText { top: 40px; font-size: 20px; }
-      #extraText { bottom: 90px; font-size: 16px; }
-      #footerText { bottom: 30px; font-size: 14px; }
-      #codeEditorLink, #puzzleLink { font-size: 12px; }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <img id="logo" src="logo6.png" alt="ondayelectronics logo">
 
-  <div id="middleText" class="text">Pek yakında görüşmek üzere :)</div>
-  <div id="extraText" class="text">İletişim: ondayfatih@gmail.com</div>
-  <div id="footerText" class="text">Fatih Önday - Elektrik Elektronik Mühendisi</div>
+  <div class="bg-overlay"></div>
 
-  <div id="codeEditorLink" onclick="window.location.href='codeeditor/index.html'">Code Editor</div>
-  <div id="puzzleLink" onclick="window.location.href='kaydirma_yapboz.html'">Kaydırmalı Yapboz</div>
+  <nav class="lang-selector">
+    <button class="lang-btn active" data-lang="TR">TR</button>
+    <span class="lang-divider">|</span>
+    <button class="lang-btn" data-lang="EN">EN</button>
+    <span class="lang-divider">|</span>
+    <button class="lang-btn" data-lang="CN">中文</button>
+  </nav>
+
+  <div class="hover-zone" id="hoverZone"></div>
+
+  <aside class="cv-drawer" id="cvDrawer">
+    <a id="cvDownloadBtn" href="assets/001-Fatih-Onday-CV-TR.pdf" download="001-Fatih-Onday-CV-TR.pdf" class="floating-download-btn" title="PDF Olarak İndir">
+      <i class="fa-solid fa-download"></i>
+    </a>
+    <div class="cv-image-container">
+      <img id="cvImage" src="assets/001-Fatih-Onday-CV-TR.jpg" alt="Fatih Önday CV" class="cv-image">
+    </div>
+  </aside>
+
+  <main class="container">
+    
+    <img id="logo" src="assets/logo6.png" alt="ondayelectronics logo">
+    <div class="subtitle">Fatih Önday <br> <span class="engineer-text" id="engineerText">Elektrik Elektronik Mühendisi</span></div>
+
+    <footer class="social-links">
+      <a href="mailto:ondayfatih@gmail.com" class="social-btn email" title="E-posta"><i class="fa-solid fa-envelope"></i></a>
+      <a href="https://github.com/" target="_blank" class="social-btn github" title="GitHub"><i class="fa-brands fa-github"></i></a>
+      <a href="https://linkedin.com/" target="_blank" class="social-btn linkedin" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+      <a href="https://instagram.com/" target="_blank" class="social-btn instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      <a href="https://spotify.com/" target="_blank" class="social-btn spotify" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
+    </footer>
+
+    <div class="section-title" id="toolsTitle">Öne Çıkan Uygulamalar & Araçlar</div>
+    <div class="tools-grid">
+      <a href="codeeditor/index.html" class="tool-card editor">
+        <h3>Code Editor</h3>
+        <span id="editorSub">Geliştirici Arayüzü</span>
+      </a>
+      <a href="pcbeditor/index.html" class="tool-card pcb">
+        <h3>PCB Editor</h3>
+        <span id="pcbSub">Devre Tasarım Aracı</span>
+      </a>
+      <a href="kaydirma_yapboz.html" class="tool-card puzzle">
+        <h3 id="puzzleTitle">Kaydırmalı Yapboz</h3>
+        <span id="puzzleSub">İnteraktif Modül</span>
+      </a>
+    </div>
+
+    <section class="bio-card">
+      <img src="assets/profil.jpg" alt="Fatih Önday Profil" class="profile-img">
+      <h2 id="bioTitle">Fatih Önday Kimdir?</h2>
+      <div id="bioContent"></div>
+    </section>
+
+  </main>
+
+  <script src="js/script.js"></script>
 </body>
 </html>
