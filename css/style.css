@@ -18,7 +18,6 @@
 body {
   min-height: 100vh;
   background-color: var(--bg-dark);
-  /* css/ klasöründen assets/ klasörüne erişim */
   background-image: url("../assets/000718.jpg"); 
   background-size: cover;
   background-position: center;
@@ -46,27 +45,33 @@ body {
   border: 1px solid var(--card-border); padding: 8px 16px;
   border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
+
 .lang-btn {
   background: none; border: none; color: var(--text-muted);
   font-size: 0.85rem; font-weight: 600; cursor: pointer;
   transition: all 0.3s ease; padding: 2px 4px;
 }
+
 .lang-btn:hover, .lang-btn.active {
   color: var(--accent-cyan); text-shadow: 0 0 10px var(--accent-glow);
 }
+
 .lang-divider { color: var(--card-border); font-size: 0.8rem; }
 
+/* ANA KONTEYNER */
 .container {
   position: relative; z-index: 2; max-width: 850px;
   margin: 0 auto; padding: 60px 20px 80px 20px;
   display: flex; flex-direction: column; align-items: center; text-align: center;
 }
+
 #logo { width: 100%; max-width: 500px; margin-bottom: 20px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.8)); }
 .subtitle { font-size: 1.6rem; letter-spacing: 1px; color: var(--text-main); font-weight: 600; margin-bottom: 30px; line-height: 1.4; }
 .engineer-text { font-size: 1.1rem; letter-spacing: 3px; color: var(--accent-cyan); text-transform: uppercase; font-weight: 500; }
 
-/* SOSYAL MEDYA BUTONLARI & ÖZEL RENK PARLAMALARI */
+/* SOSYAL MEDYA BUTONLARI & MARKA PARLAMALARI */
 .social-links { display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 50px; }
+
 .social-btn {
   width: 55px; height: 55px; border-radius: 50%; background: var(--card-bg);
   border: 1px solid var(--card-border); color: var(--text-main);
@@ -95,7 +100,7 @@ body {
   box-shadow: 0 0 25px rgba(29, 185, 84, 0.6);
 }
 
-/* ARAÇLAR BÖLÜMÜ (3'lü Yan Yana Grid) */
+/* ARAÇLAR BÖLÜMÜ (3'lü Grid) */
 .section-title { font-size: 1.1rem; margin-bottom: 20px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
 .tools-grid {
@@ -103,6 +108,7 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 20px; width: 100%; margin-bottom: 60px;
 }
+
 .tool-card {
   background: var(--card-bg); border: 1px solid var(--card-border);
   padding: 30px 10px; border-radius: 8px; text-decoration: none;
@@ -116,40 +122,46 @@ body {
 .tool-card.pcb:hover { transform: translateY(-3px); border-color: #f2aa4c; box-shadow: 0 0 25px var(--orange-glow); }
 .tool-card.puzzle:hover { transform: translateY(-3px); border-color: var(--accent-cyan); box-shadow: 0 0 25px var(--accent-glow); }
 
-/* BIO KART */
+/* BİYOGRAFİ KARTI */
 .bio-card {
   background: var(--card-bg); border: 1px solid var(--card-border);
   backdrop-filter: blur(10px); padding: 45px 35px 35px 35px;
   border-radius: 8px; margin-bottom: 20px; line-height: 1.8; text-align: left; width: 100%;
 }
+
 .profile-img {
   width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
   border: 2px solid var(--card-border); display: block; margin: 0 auto 25px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
+
 .bio-card h2 { font-size: 1.5rem; margin-bottom: 20px; color: var(--text-main); font-weight: 600; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; text-align: center; }
 #bioContent p { color: #cbd5e1; font-size: 1rem; margin-bottom: 15px; }
 #bioContent p:last-child { margin-bottom: 0; }
 
-/* CV DRAWER */
+/* SAĞDAN KAYAN CV PANELİ */
 .hover-zone { position: fixed; right: 0; top: 0; width: 25px; height: 100%; z-index: 98; }
+
 .cv-drawer {
   position: fixed; top: 0; right: -600px; width: 550px; max-width: 90vw; height: 100%;
   background: #0b0f17; border-left: 1px solid var(--card-border); z-index: 100;
   box-shadow: -15px 0 35px rgba(0,0,0,0.9); transition: right 0.4s ease-in-out;
   display: flex; flex-direction: column; padding: 0;
 }
+
 .cv-drawer.active { right: 0; }
+
 .floating-download-btn {
   position: absolute; top: 25px; right: 35px; width: 45px; height: 45px; border-radius: 8px;
   background: rgba(11, 15, 23, 0.7); backdrop-filter: blur(5px); border: 1px solid var(--card-border);
   color: var(--text-muted); display: flex; align-items: center; justify-content: center;
   font-size: 1.2rem; text-decoration: none; z-index: 10; transition: all 0.3s ease;
 }
+
 .floating-download-btn:hover { background: var(--accent-cyan); border-color: var(--accent-cyan); color: #070a0f; box-shadow: 0 0 15px var(--accent-glow); transform: translateY(-2px); }
 .cv-image-container { width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; }
 .cv-image { width: 100%; height: auto; display: block; }
 
-/* MOBİL DÜZENLEMELER */
+/* MOBİL UYUMLULUK */
 @media (max-width: 768px) {
   .lang-selector { top: 15px; left: 15px; padding: 6px 12px; }
   .container { padding: 80px 15px 60px 15px; }
