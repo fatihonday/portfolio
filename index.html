@@ -5,14 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ondayelectronics | Fatih Önday</title>
 
-  <link rel="icon" href="assets/favicon-siyah.png?v=2">
-  <link rel="shortcut icon" href="assets/favicon.ico?v=2">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2">
+  <link id="dynamic-favicon" rel="icon" type="image/png" sizes="96x96" href="assets/favicon-siyah.png">
+  <link rel="shortcut icon" href="assets/favicon-siyah.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="assets/site.webmanifest">
 
-  <link rel="icon" type="image/png" sizes="96x96" href="assets/favicon-siyah.png?v=2" media="(prefers-color-scheme: light)">
-  
-  <link rel="icon" type="image/png" sizes="96x96" href="assets/favicon-beyaz.png?v=2" media="(prefers-color-scheme: dark)">
+  <script>
+    function updateFavicon() {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const favicon = document.getElementById('dynamic-favicon');
+      // Temaya göre siyah veya beyaz png'yi atar, tarayıcıyı yenilemeye zorlamak için time damgası kullanır
+      favicon.href = isDark ? 'assets/favicon-beyaz.png?v=' + Date.now() : 'assets/favicon-siyah.png?v=' + Date.now();
+    }
+    // Sayfa açılır açılmaz çalıştır
+    updateFavicon();
+    // İşletim sistemi teması değiştiğinde anında dinle ve değiştir
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+  </script>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
