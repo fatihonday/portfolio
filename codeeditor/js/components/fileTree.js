@@ -88,6 +88,17 @@ function renderFileTree() {
         actionsDiv.appendChild(downBtn);
       }
 
+      // 📥 Bilgisayardaki Klasöre İndir / Kaydet Butonu
+      const exportBtn = document.createElement("button");
+      exportBtn.className = "node-btn";
+      exportBtn.textContent = "💾";
+      exportBtn.title = "Bilgisayarda Klasöre Kaydet";
+      exportBtn.onclick = (e) => {
+        e.stopPropagation();
+        exportNodeToDirectory(fullPath);
+      };
+      actionsDiv.appendChild(exportBtn);
+
       // Klasör ise '+' butonu ekleyelim
       if (node.type === "folder") {
         const addBtn = document.createElement("button");
@@ -122,6 +133,84 @@ function renderFileTree() {
   }
 
   buildTreeUI(state.projectData.tree, container);
+}
+
+/**
+ * Belirli Bir Dosya ya da Klasörü Bilgisayardaki Seçilen Klasöre Kaydeder
+ */
+async function exportNodeToDirectory(path) {
+  // Eğer editörde açık olan dosya kaydediliyorsa güncel içeriği al
+  if (state.activeFilePath) {
+    const activeNode = getNodeByPath(state.activeFilePath);
+    if (activeNode) activeNode.content = editor.getValue();
+  }
+
+  const targetNode = getNodeByPath(path);
+  if (!targetNode) {
+    logToConsole(`"${path}" bulunamadı.`, "error");
+    return;
+  }
+
+  const nodeName = path.split("/").pop();
+
+  // Tarayıcı File System Access API desteği kontrolü
+  if (!window.showDirectoryPicker) {
+    // Fallback: Tek dosya ise doğrudan tarayıcı indirmesi yap
+    if (targetNode.type === "file") {
+      const blob = new Blob([targetNode.content || ""], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = nodeName;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      logToConsole(`"${nodeName}" indirildi.`, "success");
+    } else {
+      logToConsole("Tarayıcınız klasör dışa aktarmayı desteklemiyor. Lütfen ZIP İndir seçeneğini kullanın.", "warn");
+    }
+    return;
+  }
+
+  try {
+    logToConsole(`"${nodeName}" öğesinin kaydedileceği bilgisayar klasörünü seçin...`, "info");
+    const dirHandle = await window.showDirectoryPicker();
+
+    if (targetNode.type === "file") {
+      // Tek Dosya Yazımı
+      const fileHandle = await dirHandle.getFileHandle(nodeName, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(targetNode.content || "");
+      await writable.close();
+      logToConsole(`✅ "${nodeName}" dosyası "${dirHandle.name}" klasörüne kaydedildi.`, "success");
+    } else if (targetNode.type === "folder") {
+      // Klasör ve Alt Öğeleri Özyineli (Recursive) Yazma
+      async function writeFolderRecursively(folderNode, parentDirHandle, folderName) {
+        const subDirHandle = await parentDirHandle.getDirectoryHandle(folderName, { create: true });
+        if (folderNode.children) {
+          for (let childName in folderNode.children) {
+            const child = folderNode.children[childName];
+            if (child.type === "file") {
+              const fHandle = await subDirHandle.getFileHandle(childName, { create: true });
+              const writable = await fHandle.createWritable();
+              await writable.write(child.content || "");
+              await writable.close();
+            } else if (child.type === "folder") {
+              await writeFolderRecursively(child, subDirHandle, childName);
+            }
+          }
+        }
+      }
+
+      await writeFolderRecursively(targetNode, dirHandle, nodeName);
+      logToConsole(`✅ "${nodeName}" klasörü ve alt öğeleri "${dirHandle.name}" klasörüne kaydedildi.`, "success");
+    }
+  } catch (err) {
+    if (err.name === "AbortError") {
+      logToConsole("Klasör seçimi iptal edildi.", "info");
+    } else {
+      console.error(err);
+      logToConsole("Kaydetme hatası: " + err.message, "error");
+    }
+  }
 }
 
 /**
