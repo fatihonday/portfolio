@@ -37,6 +37,26 @@ function bindEvents() {
   document.getElementById("btnAddFolder").onclick = () => promptCreateFolder();
   document.getElementById("btnOpenSchema").onclick = openSchemaModal;
 
+  // Yeni Eklenen Kopyala Butonu (İkon Tıklaması)
+  document.getElementById("btnCopyCodeIcon").onclick = copyCodeToClipboard;
+
+  // Arama Paneli Butonları ve İnput Yönetimi
+  const searchInput = document.getElementById("searchInput");
+  searchInput.oninput = (e) => performSearch(e.target.value);
+  searchInput.onkeydown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      // Shift+Enter basılırsa öncekini bul, sadece Enter ise sonrakini
+      if (e.shiftKey) prevSearchMatch();
+      else nextSearchMatch();
+    } else if (e.key === "Escape") {
+      closeSearchPanel();
+    }
+  };
+  document.getElementById("searchNext").onclick = nextSearchMatch;
+  document.getElementById("searchPrev").onclick = prevSearchMatch;
+  document.getElementById("searchClose").onclick = closeSearchPanel;
+
   // Konsol Eventleri
   document.getElementById("btnClearConsoleLogs").onclick = clearConsoleLogs;
   document.getElementById("consoleMinMaxBtn").onclick = toggleConsoleMinimize;
@@ -84,6 +104,24 @@ function bindEvents() {
     if (e.data && e.data.type === 'PREVIEW_LOG') {
       logToConsole(`[İçerik]: ${e.data.msg}`, e.data.logLevel);
     }
+  });
+}
+
+/* KOD KOPYALAMA FONKSİYONU */
+function copyCodeToClipboard() {
+  if (!editor) return;
+  const content = editor.getValue();
+  
+  if (!content) {
+    logToConsole("Kopyalanacak kod alanı boş.", "warn");
+    return;
+  }
+  
+  navigator.clipboard.writeText(content).then(() => {
+    logToConsole("✅ Kod başarıyla panoya kopyalandı.", "success");
+  }).catch(err => {
+    console.error(err);
+    logToConsole("Kopyalama işlemi başarısız: " + err, "error");
   });
 }
 
@@ -167,13 +205,12 @@ async function loadProjectData(name) {
       };
     }
 
-    // Hiçbir sekme veya dosya otomatik açılmasın
     state.openTabs = [];
     state.activeFilePath = null;
     state.isDirty = false;
 
     if (editor) {
-      editor.setValue(""); // Editörü temizle
+      editor.setValue(""); 
     }
 
     renderTabs();
