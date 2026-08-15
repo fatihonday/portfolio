@@ -248,7 +248,7 @@ body.dark #editor {
   transform: translate(-50%, -50%);
   width: 280px;
   height: 280px;
-  background-image: url('../assets/ondayelectronicslogo1.png');
+  background-image: url('../assets/ondayelectronicslogo2.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -257,7 +257,7 @@ body.dark #editor {
   z-index: 1; /* Logoyu en altta tut */
 }
 body.dark #editor::before {
-  background-image: url('../assets/ondayelectronicslogo2.png');
+  background-image: url('../assets/ondayelectronicslogo1.png');
   opacity: 0.09;
 }
 
