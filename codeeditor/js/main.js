@@ -29,6 +29,7 @@ function bindEvents() {
   document.getElementById("btnRunCode").onclick = runCode;
   document.getElementById("btnClearCode").onclick = clearCode;
   document.getElementById("btnDownloadHtml").onclick = saveCode;
+  document.getElementById("btnDownloadZip").onclick = downloadProjectAsZip;
   document.getElementById("btnOpenNotepad").onclick = openNotepadModal;
 
   // Ağaç Butonları
@@ -346,4 +347,70 @@ function toggleEditor() {
   const prev = document.getElementById("preview");
   ed.style.display = ed.style.display === "none" ? "flex" : "none";
   prev.style.width = ed.style.display === "none" ? "100%" : "50%";
+}
+
+/**
+ * Projeyi Klasör Yapısını Koruyarak ZIP Olarak İndirme
+ */
+async function downloadProjectAsZip() {
+  // Eğer editörde açık bir dosya varsa önce onun güncel halini belleğe al
+  if (state.activeFilePath) {
+    const activeNode = getNodeByPath(state.activeFilePath);
+    if (activeNode) activeNode.content = editor.getValue();
+  }
+
+  if (!state.projectData || !state.projectData.tree) {
+    logToConsole("İndirilecek proje verisi bulunamadı.", "error");
+    return;
+  }
+
+  logToConsole("Proje ZIP olarak hazırlanıyor, lütfen bekleyin...", "info");
+
+  try {
+    const zip = new window.JSZip();
+
+    // 1. Ağaç yapısındaki (Tree) dosya ve klasörleri ZIP'e ekleyen özyineli (recursive) fonksiyon
+    function addTreeToZip(treeObj, currentFolder) {
+      for (let name in treeObj) {
+        const node = treeObj[name];
+        if (node.type === "file") {
+          currentFolder.file(name, node.content || "");
+        } else if (node.type === "folder" && node.children) {
+          const subFolder = currentFolder.folder(name);
+          addTreeToZip(node.children, subFolder);
+        }
+      }
+    }
+
+    addTreeToZip(state.projectData.tree, zip);
+
+    // 2. Yüklü varlıkları (Medya/Assets) ZIP'e Ekle
+    // Varlıklar veritabanında Base64 Data URL (data:image/png;base64,...) olarak tutuluyor.
+    if (state.projectData.files) {
+      for (let fname in state.projectData.files) {
+        const dataUrl = state.projectData.files[fname];
+        // Sadece virgülden sonraki gerçek base64 verisini alıyoruz
+        const base64Data = dataUrl.split(',')[1];
+        if (base64Data) {
+          zip.file(fname, base64Data, { base64: true });
+        }
+      }
+    }
+
+    // 3. ZIP Dosyasını Oluştur ve İndir
+    const content = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(content);
+    
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = (state.selectedProject || "Yeni_Proje") + ".zip";
+    a.click();
+    
+    URL.revokeObjectURL(url);
+    logToConsole(`📦 Proje "${a.download}" olarak başarıyla indirildi.`, "success");
+
+  } catch (error) {
+    console.error(error);
+    logToConsole("ZIP oluşturulurken hata oluştu: " + error.message, "error");
+  }
 }
