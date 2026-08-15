@@ -353,7 +353,6 @@ function toggleEditor() {
  * Projeyi Klasör Yapısını Koruyarak ZIP Olarak İndirme
  */
 async function downloadProjectAsZip() {
-  // Eğer editörde açık bir dosya varsa önce onun güncel halini belleğe al
   if (state.activeFilePath) {
     const activeNode = getNodeByPath(state.activeFilePath);
     if (activeNode) activeNode.content = editor.getValue();
@@ -369,7 +368,6 @@ async function downloadProjectAsZip() {
   try {
     const zip = new window.JSZip();
 
-    // 1. Ağaç yapısındaki (Tree) dosya ve klasörleri ZIP'e ekleyen özyineli (recursive) fonksiyon
     function addTreeToZip(treeObj, currentFolder) {
       for (let name in treeObj) {
         const node = treeObj[name];
@@ -384,12 +382,9 @@ async function downloadProjectAsZip() {
 
     addTreeToZip(state.projectData.tree, zip);
 
-    // 2. Yüklü varlıkları (Medya/Assets) ZIP'e Ekle
-    // Varlıklar veritabanında Base64 Data URL (data:image/png;base64,...) olarak tutuluyor.
     if (state.projectData.files) {
       for (let fname in state.projectData.files) {
         const dataUrl = state.projectData.files[fname];
-        // Sadece virgülden sonraki gerçek base64 verisini alıyoruz
         const base64Data = dataUrl.split(',')[1];
         if (base64Data) {
           zip.file(fname, base64Data, { base64: true });
@@ -397,7 +392,6 @@ async function downloadProjectAsZip() {
       }
     }
 
-    // 3. ZIP Dosyasını Oluştur ve İndir
     const content = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(content);
     
