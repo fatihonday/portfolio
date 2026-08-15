@@ -222,6 +222,8 @@ body.dark #dropZone { color: #aaa; border-color: #555; }
 /* ----------------------------------------------------
    KOD ALANI VE WATERMARK (ARKA PLAN LOGOSU) AYARLARI 
 ------------------------------------------------------- */
+
+/* 1. Editörün Kendisi: Arka plan renklerini artık burada tutuyoruz */
 #editor { 
   flex: 1; 
   height: 100%; 
@@ -230,21 +232,15 @@ body.dark #dropZone { color: #aaa; border-color: #555; }
   border-right: 1px solid #ccc; 
   min-width: 0; 
   position: relative;
+  background-color: #ffffff; /* Aydınlık tema arka planı */
 }
-body.dark #editor { border-color: #383838; }
-
-.CodeMirror { 
-  position: relative;
-  flex: 1; 
-  height: 100% !important; 
-  font-size: 13px; 
-  background-color: #ffffff !important; 
-}
-body.dark .CodeMirror {
-  background-color: #282a36 !important;
+body.dark #editor { 
+  border-color: #383838; 
+  background-color: #282a36; /* Karanlık (Dracula) tema arka planı */
 }
 
-.CodeMirror::after {
+/* 2. Filigran Logosu: Doğrudan kapsayıcının içine, en alt katmana ekliyoruz */
+#editor::before {
   content: "";
   position: absolute;
   top: 50%;
@@ -252,29 +248,37 @@ body.dark .CodeMirror {
   transform: translate(-50%, -50%);
   width: 280px;
   height: 280px;
-  background-image: url('../assets/ondayelectronicslogosiyah.png');
+  background-image: url('../assets/ondayelectronicslogo2.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   opacity: 0.08;
   pointer-events: none;
-  z-index: 1;
+  z-index: 1; /* Logoyu en altta tut */
 }
-body.dark .CodeMirror::after {
-  background-image: url('../assets/ondayelectronicslogobeyaz.png');
+body.dark #editor::before {
+  background-image: url('../assets/ondayelectronicslogo1.png');
   opacity: 0.09;
 }
 
-.CodeMirror-scroll {
+/* 3. CodeMirror: Katmanları tamamen saydam yapıyoruz ki alttaki logo parlasın */
+.CodeMirror { 
   position: relative;
-  z-index: 2;
-  background: transparent !important;
-}
-.CodeMirror-sizer,
-.CodeMirror-lines {
-  background: transparent !important;
+  flex: 1; 
+  height: 100% !important; 
+  font-size: 13px; 
+  background-color: transparent !important; 
+  z-index: 2; /* Kodlar logonun üstünde kalsın */
 }
 
+/* Saydamlık zorlaması */
+.CodeMirror-scroll,
+.CodeMirror-sizer,
+.CodeMirror-lines {
+  background-color: transparent !important;
+}
+
+/* 4. Satır Numaraları: Bunların okunabilirliği için saydamlıktan muaf tutuyoruz */
 .CodeMirror-gutters {
   z-index: 3 !important;
   background-color: #f7f7f7 !important;
@@ -298,6 +302,8 @@ body.dark .cm-tab { border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 10; /* Logonun üstünde kalmasını garantile */
 }
 body.dark #editorHeader { background: #2d2d2d; border-color: #383838; }
 
@@ -339,7 +345,7 @@ body.dark .tab-item.active { background: #1e1e1e; color: #fff; border-bottom-col
 .tab-close:hover { background: rgba(0,0,0,0.1); color: #e74c3c; }
 
 /* ----------------------------------------------------
-   YENİ: SAĞ ÜSTTE ŞEFFAF KOPYALA SİMGESİ VE ARAMA PANELİ
+   SAĞ ÜSTTE ŞEFFAF KOPYALA SİMGESİ VE ARAMA PANELİ
 ------------------------------------------------------- */
 .copy-icon-btn {
   position: absolute;
@@ -368,7 +374,7 @@ body.dark .copy-icon-btn:hover { color: #75beff; }
 .search-panel {
   position: absolute;
   top: 36px;
-  right: 56px; /* Kopyala butonuyla çakışmaması için hafif solda */
+  right: 56px;
   z-index: 20;
   background: #f5f5f5;
   border: 1px solid #ccc;
@@ -416,13 +422,11 @@ body.dark .search-panel button { color: #ccc; }
 .search-panel button:hover { background: #e0e0e0; color: #000; }
 body.dark .search-panel button:hover { background: #444; color: #fff; }
 
-/* Arama Eşleşmesi (Pasif) Vurgusu (CodeMirror Default Class) */
 .cm-searching { background-color: rgba(255, 255, 0, 0.4); }
 body.dark .cm-searching { background-color: rgba(255, 255, 0, 0.25); color: #fff; }
 
-/* Arama Eşleşmesi (Aktif/Seçili) Vurgusu */
 .cm-search-match-active {
-  background-color: #ff9800; /* Belirgin Turuncu */
+  background-color: #ff9800;
   color: #fff !important;
   border-radius: 2px;
 }
