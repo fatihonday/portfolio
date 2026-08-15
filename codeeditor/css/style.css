@@ -177,7 +177,6 @@ body.dark .tree-row { color: #bbb; }
 .tree-row:hover { background: #e0e0e0; }
 body.dark .tree-row:hover { background: #2a2d2e; }
 
-/* Seçili Öğe Vurgusu */
 .tree-row.selected {
   background: #007acc !important;
   color: #fff !important;
@@ -234,7 +233,6 @@ body.dark #dropZone { color: #aaa; border-color: #555; }
 }
 body.dark #editor { border-color: #383838; }
 
-/* CodeMirror Ana Kapsayıcısı */
 .CodeMirror { 
   position: relative;
   flex: 1; 
@@ -246,7 +244,6 @@ body.dark .CodeMirror {
   background-color: #282a36 !important;
 }
 
-/* Editör Ortasındaki Saydam Watermark Logo */
 .CodeMirror::after {
   content: "";
   position: absolute;
@@ -255,20 +252,19 @@ body.dark .CodeMirror {
   transform: translate(-50%, -50%);
   width: 280px;
   height: 280px;
-  background-image: url('../assets/ondayelectronicslogo2.png');
+  background-image: url('../assets/ondayelectronicslogosiyah.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  opacity: 0.08; /* Açık temada hafif görünür */
+  opacity: 0.08;
   pointer-events: none;
   z-index: 1;
 }
 body.dark .CodeMirror::after {
-  background-image: url('../assets/ondayelectronicslogo1.png');
-  opacity: 0.09; /* Karanlık temada hafif görünür */
+  background-image: url('../assets/ondayelectronicslogobeyaz.png');
+  opacity: 0.09;
 }
 
-/* Kod Metinlerinin Logonun Üzerinde Kalması İçin */
 .CodeMirror-scroll {
   position: relative;
   z-index: 2;
@@ -279,7 +275,6 @@ body.dark .CodeMirror::after {
   background: transparent !important;
 }
 
-/* Satır Numaraları Çubuğu (Gutter) */
 .CodeMirror-gutters {
   z-index: 3 !important;
   background-color: #f7f7f7 !important;
@@ -290,19 +285,23 @@ body.dark .CodeMirror-gutters {
   border-right: 1px solid #383a46 !important;
 }
 
-/* DİKEY REFERANS ÇİZGİLERİ (Indent Guides) */
-.cm-tab {
-  border-left: 1px solid rgba(0, 0, 0, 0.15) !important;
-}
-body.dark .cm-tab {
-  border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
-}
+.cm-tab { border-left: 1px solid rgba(0, 0, 0, 0.15) !important; }
+body.dark .cm-tab { border-left: 1px solid rgba(255, 255, 255, 0.15) !important; }
 
-/* Sekmeler */
+/* ----------------------------------------------------
+   SEKMELER
+------------------------------------------------------- */
+#editorHeader {
+  height: 28px;
+  background: #e1e1e1;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+body.dark #editorHeader { background: #2d2d2d; border-color: #383838; }
+
 #editorTabs { 
-  height: 28px; 
-  background: #e1e1e1; 
-  border-bottom: 1px solid #ccc; 
   display: flex; 
   align-items: center; 
   padding-left: 4px; 
@@ -311,15 +310,12 @@ body.dark .cm-tab {
   overflow-y: hidden;
   white-space: nowrap;
   min-width: 0;
-  
+  flex: 1;
+  height: 100%;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-body.dark #editorTabs { background: #2d2d2d; border-color: #383838; }
-
-#editorTabs::-webkit-scrollbar {
-  display: none;
-}
+#editorTabs::-webkit-scrollbar { display: none; }
 
 .tab-item { 
   height: 28px; 
@@ -341,6 +337,96 @@ body.dark .tab-item { background: #252526; border-color: #383838; color: #888; }
 body.dark .tab-item.active { background: #1e1e1e; color: #fff; border-bottom-color: #75beff; }
 .tab-close { font-size: 10px; border-radius: 50%; padding: 0 3px; color: #888; }
 .tab-close:hover { background: rgba(0,0,0,0.1); color: #e74c3c; }
+
+/* ----------------------------------------------------
+   YENİ: SAĞ ÜSTTE ŞEFFAF KOPYALA SİMGESİ VE ARAMA PANELİ
+------------------------------------------------------- */
+.copy-icon-btn {
+  position: absolute;
+  top: 36px;
+  right: 20px;
+  z-index: 10;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #777;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0.5; 
+}
+body.dark .copy-icon-btn { color: #aaa; }
+.copy-icon-btn:hover {
+  opacity: 1;
+  color: #007acc;
+}
+body.dark .copy-icon-btn:hover { color: #75beff; }
+
+.search-panel {
+  position: absolute;
+  top: 36px;
+  right: 56px; /* Kopyala butonuyla çakışmaması için hafif solda */
+  z-index: 20;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: none; 
+  align-items: center;
+  padding: 4px 8px;
+  gap: 5px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+body.dark .search-panel { background: #2d2d2d; border-color: #444; }
+
+.search-panel input {
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 4px 6px;
+  font-size: 12px;
+  border-radius: 2px;
+  width: 150px;
+  outline: none;
+}
+body.dark .search-panel input { background: #1e1e1e; border-color: #555; color: #eee; }
+.search-panel input:focus { border-color: #007acc; }
+body.dark .search-panel input:focus { border-color: #75beff; }
+
+.search-panel span {
+  font-size: 11px;
+  color: #666;
+  min-width: 45px;
+  text-align: center;
+  font-family: monospace;
+}
+body.dark .search-panel span { color: #aaa; }
+
+.search-panel button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 3px 5px;
+  border-radius: 2px;
+  color: #444;
+}
+body.dark .search-panel button { color: #ccc; }
+.search-panel button:hover { background: #e0e0e0; color: #000; }
+body.dark .search-panel button:hover { background: #444; color: #fff; }
+
+/* Arama Eşleşmesi (Pasif) Vurgusu (CodeMirror Default Class) */
+.cm-searching { background-color: rgba(255, 255, 0, 0.4); }
+body.dark .cm-searching { background-color: rgba(255, 255, 0, 0.25); color: #fff; }
+
+/* Arama Eşleşmesi (Aktif/Seçili) Vurgusu */
+.cm-search-match-active {
+  background-color: #ff9800; /* Belirgin Turuncu */
+  color: #fff !important;
+  border-radius: 2px;
+}
+body.dark .cm-search-match-active { background-color: #d87b00; }
 
 #preview { width: 50%; height: 100%; border: none; background: #fff; }
 
