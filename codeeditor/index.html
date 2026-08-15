@@ -77,7 +77,28 @@
 
       <div id="mainWorkspace">
         <div id="editor">
-          <div id="editorTabs"></div>
+          <div id="editorHeader">
+            <div id="editorTabs"></div>
+          </div>
+          
+          <!-- YENİ: Sağ Üstte Minimalist Kopyala Butonu -->
+          <button class="copy-icon-btn" id="btnCopyCodeIcon" title="Kodu Kopyala">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+
+          <!-- Gelişmiş Arama Paneli -->
+          <div id="searchPanel" class="search-panel">
+            <input type="text" id="searchInput" placeholder="Bul...">
+            <span id="searchCount"></span>
+            <button id="searchPrev" title="Önceki Bulgu">▲</button>
+            <button id="searchNext" title="Sonraki Bulgu">▼</button>
+            <div class="v-divider"></div>
+            <button id="searchClose" title="Kapat">✕</button>
+          </div>
+
           <textarea id="code"></textarea>
         </div>
         <iframe id="preview"></iframe>
@@ -147,6 +168,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/javascript/javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/css/css.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/htmlmixed/htmlmixed.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/addon/search/searchcursor.min.js"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
