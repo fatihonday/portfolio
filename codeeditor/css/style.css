@@ -223,7 +223,7 @@ body.dark #dropZone { color: #aaa; border-color: #555; }
    KOD ALANI VE WATERMARK (ARKA PLAN LOGOSU) AYARLARI 
 ------------------------------------------------------- */
 
-/* 1. Editörün Kendisi: Arka plan renklerini artık burada tutuyoruz */
+/* 1. Editörün Kendisi */
 #editor { 
   flex: 1; 
   height: 100%; 
@@ -232,14 +232,14 @@ body.dark #dropZone { color: #aaa; border-color: #555; }
   border-right: 1px solid #ccc; 
   min-width: 0; 
   position: relative;
-  background-color: #ffffff; /* Aydınlık tema arka planı */
+  background-color: #ffffff; 
 }
 body.dark #editor { 
   border-color: #383838; 
-  background-color: #282a36; /* Karanlık (Dracula) tema arka planı */
+  background-color: #282a36; 
 }
 
-/* 2. Filigran Logosu: Doğrudan kapsayıcının içine, en alt katmana ekliyoruz */
+/* 2. Filigran Logosu */
 #editor::before {
   content: "";
   position: absolute;
@@ -254,31 +254,36 @@ body.dark #editor {
   background-position: center;
   opacity: 0.08;
   pointer-events: none;
-  z-index: 1; /* Logoyu en altta tut */
+  z-index: 1;
 }
 body.dark #editor::before {
   background-image: url('../assets/ondayelectronicslogo1.png');
-  opacity: 0.09;
+  opacity: 0.15; /* Beyaz logonun karanlık temada daha belirgin olması için artırıldı */
 }
 
-/* 3. CodeMirror: Katmanları tamamen saydam yapıyoruz ki alttaki logo parlasın */
+/* 3. CodeMirror Katmanları */
 .CodeMirror { 
   position: relative;
   flex: 1; 
   height: 100% !important; 
   font-size: 13px; 
   background-color: transparent !important; 
-  z-index: 2; /* Kodlar logonun üstünde kalsın */
+  z-index: 2; 
 }
 
-/* Saydamlık zorlaması */
+/* YENİ: Dracula temasının kendi arka plan rengini kesin olarak saydam yapıyoruz */
+body.dark .CodeMirror, 
+body.dark .cm-s-dracula {
+  background-color: transparent !important;
+}
+
 .CodeMirror-scroll,
 .CodeMirror-sizer,
 .CodeMirror-lines {
   background-color: transparent !important;
 }
 
-/* 4. Satır Numaraları: Bunların okunabilirliği için saydamlıktan muaf tutuyoruz */
+/* 4. Satır Numaraları */
 .CodeMirror-gutters {
   z-index: 3 !important;
   background-color: #f7f7f7 !important;
@@ -303,7 +308,7 @@ body.dark .cm-tab { border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
   align-items: center;
   justify-content: space-between;
   position: relative;
-  z-index: 10; /* Logonun üstünde kalmasını garantile */
+  z-index: 10;
 }
 body.dark #editorHeader { background: #2d2d2d; border-color: #383838; }
 
