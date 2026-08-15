@@ -8,7 +8,24 @@ function initEditor() {
     mode: "htmlmixed",
     theme: "default",
     lineNumbers: true,
-    lineWrapping: true
+    lineWrapping: true,
+    
+    // --- YENİ EKLENEN KISIM: Dikey Referans Çizgileri İçin Tab Ayarları ---
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: true, // CSS ile şekillendireceğimiz Tab'ları zorunlu kılar
+    extraKeys: {
+      "Tab": function(cm) {
+        // Tab tuşuna basıldığında CodeMirror boşluk(space) yerine 
+        // gerçek bir \t (sekme) karakteri koyar, bu da dikey çizgiyi oluşturur.
+        if (cm.somethingSelected()) {
+          cm.indentSelection("add");
+        } else {
+          cm.replaceSelection("\t", "end", "+input");
+        }
+      }
+    }
+    // ---------------------------------------------------------------------
   });
 
   // Fare tekerleği hareketiyle sekmeleri yatayda kaydırma dinleyicisi
