@@ -5,32 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ondayelectronics | Fatih Önday</title>
 
-  <link id="dynamic-favicon" rel="icon" type="image/png" sizes="96x96" href="assets/favicon-siyah.png">
-  <link rel="shortcut icon" href="assets/favicon-siyah.png">
+  <!-- ========================================== -->
+  <!-- FAVICON (JAVASCRIPT İLE YÖNETİLECEK)       -->
+  <!-- ========================================== -->
+  <link id="dynamicFavicon" rel="icon" type="image/png" href="assets/favicon-siyah.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="assets/site.webmanifest">
+  <!-- ========================================== -->
 
-  <script>
-    function updateFavicon() {
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const favicon = document.getElementById('dynamic-favicon');
-      // Temaya göre siyah veya beyaz png'yi atar, tarayıcıyı yenilemeye zorlamak için time damgası kullanır
-      favicon.href = isDark ? 'assets/favicon-beyaz.png?v=' + Date.now() : 'assets/favicon-siyah.png?v=' + Date.now();
-    }
-    // Sayfa açılır açılmaz çalıştır
-    updateFavicon();
-    // İşletim sistemi teması değiştiğinde anında dinle ve değiştir
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
-  </script>
-  
+  <!-- FontAwesome İkon Kütüphanesi -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- CSS Dosyası -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
   <div class="bg-overlay"></div>
 
+  <!-- SOL ÜST DİL SEÇİCİ -->
   <nav class="lang-selector">
     <button class="lang-btn active" data-lang="TR">TR</button>
     <span class="lang-divider">|</span>
@@ -39,8 +32,10 @@
     <button class="lang-btn" data-lang="CN">中文</button>
   </nav>
 
+  <!-- SAĞ KENAR AÇMA BÖLGESİ -->
   <div class="hover-zone" id="hoverZone"></div>
 
+  <!-- SAĞDAN KAYAN CV PANELİ -->
   <aside class="cv-drawer" id="cvDrawer">
     <a id="cvDownloadBtn" href="assets/001-Fatih-Onday-CV-TR.pdf" download="001-Fatih-Onday-CV-TR.pdf" class="floating-download-btn" title="PDF Olarak İndir">
       <i class="fa-solid fa-download"></i>
@@ -50,6 +45,7 @@
     </div>
   </aside>
 
+  <!-- ANA İÇERİK -->
   <main class="container">
     
     <img id="logo" src="assets/logo6.png" alt="ondayelectronics logo">
@@ -60,9 +56,10 @@
       <a href="https://github.com/fatihonday" target="_blank" rel="noopener noreferrer" class="social-btn github" title="GitHub"><i class="fa-brands fa-github"></i></a>
       <a href="https://www.linkedin.com/in/fatihonday" target="_blank" rel="noopener noreferrer" class="social-btn linkedin" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
       <a href="https://www.instagram.com/fatihonday" target="_blank" rel="noopener noreferrer" class="social-btn instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-      <a href="https://open.spotify.com/user/5Ub5IsaunwOu0zedPGkP7K" target="_blank" rel="noopener noreferrer" class="social-btn spotify" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
+      <a href="https://open.spotify.com/user/fatihonday" target="_blank" rel="noopener noreferrer" class="social-btn spotify" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
     </footer>
 
+    <!-- Uygulamalar & Araçlar -->
     <div class="section-title" id="toolsTitle">Öne Çıkan Uygulamalar & Araçlar</div>
     <div class="tools-grid">
       <a href="codeeditor/index.html" class="tool-card editor">
@@ -82,9 +79,7 @@
     <section class="bio-card">
       <img src="assets/profil.jpg" alt="Fatih Önday Profil" class="profile-img">
       <h2 id="bioTitle">Fatih Önday Kimdir?</h2>
-      
       <div id="bioContent"></div>
-      
     </section>
 
   </main>
