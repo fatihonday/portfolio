@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   bindEvents();
 });
 
-/* Tarayıcı Temasına Göre Favicon Değiştirme Sistemi */
 function initFaviconTheme() {
   const matcher = window.matchMedia('(prefers-color-scheme: dark)');
   
@@ -42,14 +41,13 @@ function bindEvents() {
     btn.onclick = closeSidebars;
   });
 
-  // Araçlar
+  // Araçlar (Hatalı btnExportFolder silindi)
   document.getElementById("btnSaveProject").onclick = saveProject;
   document.getElementById("btnSaveAsProject").onclick = initSaveAsProject;
   document.getElementById("btnRunCode").onclick = runCode;
   document.getElementById("btnClearCode").onclick = clearCode;
   document.getElementById("btnDownloadHtml").onclick = saveCode;
   document.getElementById("btnDownloadZip").onclick = downloadProjectAsZip;
-  document.getElementById("btnExportFolder").onclick = exportProjectToDirectory;
   document.getElementById("btnOpenNotepad").onclick = openNotepadModal;
 
   // Ağaç Butonları
@@ -57,10 +55,10 @@ function bindEvents() {
   document.getElementById("btnAddFolder").onclick = () => promptCreateFolder();
   document.getElementById("btnOpenSchema").onclick = openSchemaModal;
 
-  // Kopyala Butonu (İkon Tıklaması)
+  // Kopyala Butonu
   document.getElementById("btnCopyCodeIcon").onclick = copyCodeToClipboard;
 
-  // Arama Paneli Butonları ve İnput Yönetimi
+  // Arama Paneli
   const searchInput = document.getElementById("searchInput");
   searchInput.oninput = (e) => performSearch(e.target.value);
   searchInput.onkeydown = (e) => {
@@ -93,7 +91,7 @@ function bindEvents() {
   document.getElementById("btnSaveNotepad").onclick = saveNotepad;
   document.getElementById("btnResetCanvas").onclick = resetCanvasTransform;
 
-  // File Upload / Dropzone
+  // File Upload
   const dropZone = document.getElementById("dropZone");
   dropZone.onclick = () => document.getElementById("fileUpload").click();
   document.getElementById("fileUpload").onchange = (e) => {
@@ -107,7 +105,7 @@ function bindEvents() {
     if (e.dataTransfer.files.length > 0) handleFileUpload(e.dataTransfer.files[0]);
   });
 
-  // Sadece aktif dosyanın bellekteki içeriğini günceller & isDirty takibi yapar
+  // Editör Değişiklikleri
   editor.on("change", () => {
     if (state.activeFilePath) {
       const activeNode = getNodeByPath(state.activeFilePath);
@@ -118,7 +116,6 @@ function bindEvents() {
     }
   });
 
-  // Preview Iframe loglarını dinleme
   window.addEventListener("message", (e) => {
     if (e.data && e.data.type === 'PREVIEW_LOG') {
       logToConsole(`[İçerik]: ${e.data.msg}`, e.data.logLevel);
@@ -126,16 +123,13 @@ function bindEvents() {
   });
 }
 
-/* KOD KOPYALAMA FONKSİYONU */
 function copyCodeToClipboard() {
   if (!editor) return;
   const content = editor.getValue();
-  
   if (!content) {
     logToConsole("Kopyalanacak kod alanı boş.", "warn");
     return;
   }
-  
   navigator.clipboard.writeText(content).then(() => {
     logToConsole("✅ Kod başarıyla panoya kopyalandı.", "success");
   }).catch(err => {
@@ -144,7 +138,6 @@ function copyCodeToClipboard() {
   });
 }
 
-/* YARDIMCI FONKSİYONLAR */
 async function toggleSidebar(id) {
   const target = document.getElementById(id);
   const isOpen = target.style.display === "flex";
@@ -193,11 +186,8 @@ async function selectProject(name) {
 
   if (state.isDirty) {
     logToConsole(`⚠️ "${state.selectedProject}" projesinde kaydedilmeyen değişiklikler var!`, "warn");
-    
     requestConsoleInput(
-      `Kaydedilmeyen değişiklikler var, devam etmek istiyor musunuz? (Evet/Hayır):`,
-      "Hayır",
-      async (ans) => {
+      `Devam etmek istiyor musunuz? (Evet/Hayır):`, "Hayır", async (ans) => {
         if (ans.toLowerCase() === "evet" || ans.toLowerCase() === "e") {
           state.isDirty = false;
           await loadProjectData(name);
@@ -223,15 +213,11 @@ async function loadProjectData(name) {
         "script.js": { type: "file", content: state.projectData.js || "" }
       };
     }
-
     state.openTabs = [];
     state.activeFilePath = null;
     state.isDirty = false;
 
-    if (editor) {
-      editor.setValue(""); 
-    }
-
+    if (editor) editor.setValue(""); 
     renderTabs();
     renderFileTree();
 
@@ -240,7 +226,7 @@ async function loadProjectData(name) {
     await renderProjectFiles();
     runCode();
     closeSidebars();
-    logToConsole(`"${name}" projesi yüklendi. Hiçbir dosya açık değil.`, "success");
+    logToConsole(`"${name}" projesi yüklendi.`, "success");
   }
 }
 
@@ -253,7 +239,6 @@ async function saveProject() {
   const projects = await getProjects();
   projects[state.selectedProject] = state.projectData;
   await setProjects(projects);
-  
   state.isDirty = false;
   logToConsole(`"${state.selectedProject}" başarıyla kaydedildi.`, "success");
 }
@@ -308,7 +293,7 @@ function handleFileUpload(file) {
     state.isDirty = true;
     await renderProjectFiles();
     runCode();
-    logToConsole(`"${file.name}" yüklendi (Kaydetmek için Kaydet butonuna basın).`, "info");
+    logToConsole(`"${file.name}" yüklendi.`, "info");
   };
   reader.readAsDataURL(file);
 }
@@ -338,7 +323,7 @@ async function removeFileFromProject(fileName) {
     state.isDirty = true;
     await renderProjectFiles();
     runCode();
-    logToConsole(`"${fileName}" kaldırıldı (Kaydetmek için Kaydet butonuna basın).`, "info");
+    logToConsole(`"${fileName}" kaldırıldı.`, "info");
   }
 }
 
@@ -353,7 +338,7 @@ async function saveNotepad() {
   state.projectData.notes = document.getElementById("notepadTextarea").value;
   state.isDirty = true;
   document.getElementById("notepadModal").style.display = "none";
-  logToConsole("Notlar güncellendi (Kaydetmek için Projeyi Kaydet butonuna basın).", "info");
+  logToConsole("Notlar güncellendi.", "info");
 }
 
 function openSchemaModal() {
@@ -395,7 +380,6 @@ function toggleDarkMode() {
   const isDark = document.body.classList.toggle("dark");
   editor.setOption("theme", isDark ? "dracula" : "default");
   const logoImg = document.getElementById("siteLogo");
-  // YENİ: Editör içindeki marka logosu da bir üst klasörden çekiliyor
   logoImg.src = isDark ? "../assets/ondayelectronicslogo1.png" : "../assets/ondayelectronicslogo2.png";
 }
 
@@ -406,62 +390,39 @@ function toggleEditor() {
   prev.style.width = ed.style.display === "none" ? "100%" : "50%";
 }
 
-/**
- * Projeyi Klasör Yapısını Koruyarak ZIP Olarak İndirme
- */
 async function downloadProjectAsZip() {
   if (state.activeFilePath) {
     const activeNode = getNodeByPath(state.activeFilePath);
     if (activeNode) activeNode.content = editor.getValue();
   }
-
-  if (!state.projectData || !state.projectData.tree) {
-    logToConsole("İndirilecek proje verisi bulunamadı.", "error");
-    return;
-  }
-
-  logToConsole("Proje ZIP olarak hazırlanıyor, lütfen bekleyin...", "info");
-
+  if (!state.projectData || !state.projectData.tree) return;
+  
+  logToConsole("Proje ZIP olarak hazırlanıyor...", "info");
   try {
     const zip = new window.JSZip();
-
     function addTreeToZip(treeObj, currentFolder) {
       for (let name in treeObj) {
         const node = treeObj[name];
-        if (node.type === "file") {
-          currentFolder.file(name, node.content || "");
-        } else if (node.type === "folder" && node.children) {
-          const subFolder = currentFolder.folder(name);
-          addTreeToZip(node.children, subFolder);
-        }
+        if (node.type === "file") currentFolder.file(name, node.content || "");
+        else if (node.type === "folder" && node.children) addTreeToZip(node.children, currentFolder.folder(name));
       }
     }
-
     addTreeToZip(state.projectData.tree, zip);
-
     if (state.projectData.files) {
       for (let fname in state.projectData.files) {
-        const dataUrl = state.projectData.files[fname];
-        const base64Data = dataUrl.split(',')[1];
-        if (base64Data) {
-          zip.file(fname, base64Data, { base64: true });
-        }
+        const base64Data = state.projectData.files[fname].split(',')[1];
+        if (base64Data) zip.file(fname, base64Data, { base64: true });
       }
     }
-
     const content = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(content);
-    
     const a = document.createElement("a");
     a.href = url;
     a.download = (state.selectedProject || "Yeni_Proje") + ".zip";
     a.click();
-    
     URL.revokeObjectURL(url);
-    logToConsole(`📦 Proje "${a.download}" olarak başarıyla indirildi.`, "success");
-
+    logToConsole(`📦 Proje indirildi.`, "success");
   } catch (error) {
     console.error(error);
-    logToConsole("ZIP oluşturulurken hata oluştu: " + error.message, "error");
   }
 }
