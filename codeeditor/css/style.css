@@ -245,7 +245,7 @@ body.dark #editor {
   transform: translate(-50%, -50%);
   width: 280px;
   height: 280px;
-  background-image: url('../assets/ondayelectronicslogo2.png');
+  background-image: url('../assets/ondayelectronicslogosiyah.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -254,8 +254,8 @@ body.dark #editor {
   z-index: 1;
 }
 body.dark #editor::before {
-  background-image: url('../assets/ondayelectronicslogo1.png');
-  opacity: 0.15;
+  background-image: url('../assets/ondayelectronicslogobeyaz.png');
+  opacity: 0.15; 
 }
 
 .CodeMirror { 
@@ -431,14 +431,14 @@ body.dark .cm-search-match-active { background-color: #d87b00; }
 #preview { width: 50%; height: 100%; border: none; background: #fff; }
 
 /* ----------------------------------------------------
-   KONSOL BÖLÜMÜ VE DARALTILMIŞ (MINIMIZED) YÖNETİMİ
+   KONSOL BÖLÜMÜ
 ------------------------------------------------------- */
 #consoleBar {
   height: 160px;
   background: #1e1e1e;
   color: #ddd;
   border-top: 1px solid #333;
-  display: none;
+  display: flex; /* YENİ: Başlangıçta görünür kılmak için flex yapıldı */
   flex-direction: column;
   font-family: monospace;
   font-size: 11px;
@@ -451,11 +451,10 @@ body.dark .cm-search-match-active { background-color: #d87b00; }
 #consoleBar.minimized #consoleLogs .log-line { display: none; }
 #consoleBar.minimized #consoleLogs .log-line:last-child { display: flex !important; }
 
-/* YENİ: Daraltılmış modda girdi ekranı açıldığında logları gizle, girdiyi göster */
 #consoleBar.minimized.input-active #consoleLogs { display: none !important; }
 #consoleBar.minimized.input-active #consoleInputArea { 
   display: flex !important; 
-  height: 25px; /* Sığması için */
+  height: 25px; 
   padding: 2px 8px;
   border-top: none;
 }
