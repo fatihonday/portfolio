@@ -3,27 +3,59 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  initFaviconTheme();
+  // Uygulama açılır açılmaz konsolu daraltılmış (minimized) modda başlat
+  const consoleBar = document.getElementById("consoleBar");
+  if (consoleBar) {
+    consoleBar.classList.add("minimized");
+    const btn = document.getElementById("consoleMinMaxBtn");
+    if (btn) {
+      btn.textContent = "▲"; 
+      btn.title = "Genişlet";
+    }
+  }
+
+  // Favicon ve Ana Tema dinleyicisini başlat
+  initThemeAndFavicon(); 
+  
   initEditor();
   initCanvasInteractions();
   bindEvents();
 });
 
-function initFaviconTheme() {
+/* Tarayıcı Temasına Göre Favicon ve Arayüz Teması Değiştirme Sistemi */
+function initThemeAndFavicon() {
   const matcher = window.matchMedia('(prefers-color-scheme: dark)');
   
-  function updateFavicon(e) {
+  function applyTheme(e) {
     const isDark = e.matches;
-    const iconUrl = isDark ? '../assets/favicon-beyaz.png' : '../assets/favicon-siyah.png';
     
+    // Favicon Güncelleme
+    const iconUrl = isDark ? '../assets/favicon-beyaz.png' : '../assets/favicon-siyah.png';
     const link = document.getElementById('dynamicFavicon');
     if (link) {
       link.href = iconUrl;
     }
+    
+    // Arayüz Temasını Otomatik Güncelleme
+    if (isDark) {
+      document.body.classList.add("dark");
+      if (editor) editor.setOption("theme", "dracula");
+    } else {
+      document.body.classList.remove("dark");
+      if (editor) editor.setOption("theme", "default");
+    }
+    
+    // Üst Çubuk (Top Bar) ve Düzenleyici İçi Logoları Güncelle
+    const topBarLogo = document.getElementById("siteLogo");
+    if (topBarLogo) {
+      // YENİ: Üst çubuktaki logolar (logo1 ve logo2 kullanılıyor)
+      topBarLogo.src = isDark ? "../assets/ondayelectronicslogo1.png" : "../assets/ondayelectronicslogo2.png";
+    }
   }
 
-  matcher.addEventListener('change', updateFavicon);
-  updateFavicon(matcher);
+  // Temayı algıla ve uygula
+  matcher.addEventListener('change', applyTheme);
+  applyTheme(matcher);
 }
 
 function bindEvents() {
@@ -32,7 +64,10 @@ function bindEvents() {
   document.getElementById("projectTitleDisplay").onclick = () => toggleSidebar("toolsSidebar");
   document.getElementById("btnOpenFile").onclick = () => document.getElementById("fileInput").click();
   document.getElementById("fileInput").onchange = openFile;
+  
+  // Tema butonuna basıldığında manuel olarak temanın değiştirilmesi
   document.getElementById("btnToggleTheme").onclick = toggleDarkMode;
+  
   document.getElementById("btnToggleEditor").onclick = toggleEditor;
   document.getElementById("consoleToggleBtn").onclick = () => toggleConsoleBar();
 
@@ -41,7 +76,7 @@ function bindEvents() {
     btn.onclick = closeSidebars;
   });
 
-  // Araçlar (Hatalı btnExportFolder silindi)
+  // Araçlar 
   document.getElementById("btnSaveProject").onclick = saveProject;
   document.getElementById("btnSaveAsProject").onclick = initSaveAsProject;
   document.getElementById("btnRunCode").onclick = runCode;
@@ -58,7 +93,7 @@ function bindEvents() {
   // Kopyala Butonu
   document.getElementById("btnCopyCodeIcon").onclick = copyCodeToClipboard;
 
-  // Arama Paneli
+  // Arama Paneli Butonları
   const searchInput = document.getElementById("searchInput");
   searchInput.oninput = (e) => performSearch(e.target.value);
   searchInput.onkeydown = (e) => {
@@ -91,7 +126,7 @@ function bindEvents() {
   document.getElementById("btnSaveNotepad").onclick = saveNotepad;
   document.getElementById("btnResetCanvas").onclick = resetCanvasTransform;
 
-  // File Upload
+  // File Upload / Dropzone
   const dropZone = document.getElementById("dropZone");
   dropZone.onclick = () => document.getElementById("fileUpload").click();
   document.getElementById("fileUpload").onchange = (e) => {
@@ -105,7 +140,7 @@ function bindEvents() {
     if (e.dataTransfer.files.length > 0) handleFileUpload(e.dataTransfer.files[0]);
   });
 
-  // Editör Değişiklikleri
+  // Editör Değişim Takibi
   editor.on("change", () => {
     if (state.activeFilePath) {
       const activeNode = getNodeByPath(state.activeFilePath);
@@ -376,11 +411,26 @@ function openFile(e) {
   reader.readAsText(file);
 }
 
+// YENİ: Tema Butonuyla Manuel Geçiş (Otomatik temayı geçersiz kılar)
 function toggleDarkMode() {
   const isDark = document.body.classList.toggle("dark");
-  editor.setOption("theme", isDark ? "dracula" : "default");
-  const logoImg = document.getElementById("siteLogo");
-  logoImg.src = isDark ? "../assets/ondayelectronicslogo1.png" : "../assets/ondayelectronicslogo2.png";
+  
+  if (editor) {
+    editor.setOption("theme", isDark ? "dracula" : "default");
+  }
+  
+  // Üst çubuk logosunu manuel olarak güncelle
+  const topBarLogo = document.getElementById("siteLogo");
+  if (topBarLogo) {
+    topBarLogo.src = isDark ? "../assets/ondayelectronicslogo1.png" : "../assets/ondayelectronicslogo2.png";
+  }
+  
+  // Favicon'u manuel olarak güncelle
+  const iconUrl = isDark ? '../assets/favicon-beyaz.png' : '../assets/favicon-siyah.png';
+  const link = document.getElementById('dynamicFavicon');
+  if (link) {
+    link.href = iconUrl;
+  }
 }
 
 function toggleEditor() {
