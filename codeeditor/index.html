@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <title>codeeditor/ondayelectronics</title>
 
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <!-- YENİ: Favicon yollarının başına "/" eklendi ve .ico fallback satırı eklendi -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="shortcut icon" href="/favicon.ico">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/dracula.min.css">
@@ -58,6 +60,7 @@
         <button class="tool-item" id="btnClearCode">Temizle</button>
         <button class="tool-item" id="btnDownloadHtml">HTML İndir</button>
         <button class="tool-item" id="btnDownloadZip">📦 Projeyi İndir (ZIP)</button>
+        <button class="tool-item" id="btnExportFolder">📂 Bilgisayarda Kaydet</button>
         <button class="tool-item" id="btnOpenNotepad">Not Defteri</button>
 
         <div class="section-label">PROJE MİMARİSİ</div>
@@ -81,7 +84,6 @@
             <div id="editorTabs"></div>
           </div>
           
-          <!-- YENİ: Sağ Üstte Minimalist Kopyala Butonu -->
           <button class="copy-icon-btn" id="btnCopyCodeIcon" title="Kodu Kopyala">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -89,7 +91,6 @@
             </svg>
           </button>
 
-          <!-- Gelişmiş Arama Paneli -->
           <div id="searchPanel" class="search-panel">
             <input type="text" id="searchInput" placeholder="Bul...">
             <span id="searchCount"></span>
