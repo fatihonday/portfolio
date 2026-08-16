@@ -3,10 +3,32 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  initFaviconTheme(); // YENİ: Favicon tema dinleyicisi başlatıldı
   initEditor();
   initCanvasInteractions();
   bindEvents();
 });
+
+/* YENİ EKLENEN: Tarayıcı Temasına Göre Favicon Değiştirme Sistemi */
+function initFaviconTheme() {
+  const matcher = window.matchMedia('(prefers-color-scheme: dark)');
+  
+  function updateFavicon(e) {
+    const isDark = e.matches;
+    const iconUrl = isDark ? '../assets/favicon-beyaz.png' : '../assets/favicon-siyah.png';
+    
+    const link = document.getElementById('dynamicFavicon');
+    if (link) {
+      link.href = iconUrl;
+    }
+  }
+
+  // Tarayıcı teması her değiştiğinde tetiklenir (Canlı dinleme)
+  matcher.addEventListener('change', updateFavicon);
+  
+  // Sayfa ilk yüklendiğinde mevcut duruma göre çalıştır
+  updateFavicon(matcher);
+}
 
 function bindEvents() {
   // TopBar Butonları
@@ -30,6 +52,7 @@ function bindEvents() {
   document.getElementById("btnClearCode").onclick = clearCode;
   document.getElementById("btnDownloadHtml").onclick = saveCode;
   document.getElementById("btnDownloadZip").onclick = downloadProjectAsZip;
+  document.getElementById("btnExportFolder").onclick = exportProjectToDirectory;
   document.getElementById("btnOpenNotepad").onclick = openNotepadModal;
 
   // Ağaç Butonları
@@ -37,7 +60,7 @@ function bindEvents() {
   document.getElementById("btnAddFolder").onclick = () => promptCreateFolder();
   document.getElementById("btnOpenSchema").onclick = openSchemaModal;
 
-  // Yeni Eklenen Kopyala Butonu (İkon Tıklaması)
+  // Kopyala Butonu (İkon Tıklaması)
   document.getElementById("btnCopyCodeIcon").onclick = copyCodeToClipboard;
 
   // Arama Paneli Butonları ve İnput Yönetimi
@@ -46,7 +69,6 @@ function bindEvents() {
   searchInput.onkeydown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      // Shift+Enter basılırsa öncekini bul, sadece Enter ise sonrakini
       if (e.shiftKey) prevSearchMatch();
       else nextSearchMatch();
     } else if (e.key === "Escape") {
