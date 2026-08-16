@@ -1,6 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
+    // 0. DINAMIK FAVICON (KARANLIK / AYDINLIK MOD)
+    // ==========================================
+    const dynamicFavicon = document.getElementById("dynamicFavicon");
+    
+    const updateFavicon = () => {
+        const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        // ?v= zaman damgası ekleyerek tarayıcı önbelleğini (cache) kırmaya zorluyoruz.
+        const timeStamp = new Date().getTime(); 
+        dynamicFavicon.href = isDark 
+            ? `assets/favicon-beyaz.png?v=${timeStamp}` 
+            : `assets/favicon-siyah.png?v=${timeStamp}`;
+    };
+
+    // İlk açılışta çalıştır
+    updateFavicon();
+    
+    // Tema değiştiğinde anında tepki ver
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", updateFavicon);
+
+
+    // ==========================================
     // 1. ÇOKLU DİL VE BİYOGRAFİ İÇERİKLERİ
     // ==========================================
     const translations = {
@@ -14,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
             bioTitle: "Fatih Önday Kimdir?",
             cvPdf: "assets/001-Fatih-Onday-CV-TR.pdf",
             cvJpg: "assets/001-Fatih-Onday-CV-TR.jpg",
-            bioHtml: "<p>Elektrik-Elektronik Mühendisiyim. Elektrik proje tasarımı, saha uygulamaları ve elektronik üretim süreçlerinde deneyim sahibiyim. Elektrik tesisat projeleri, teknik dokümantasyon, saha koordinasyonu, SMD/THT üretimi, Pick and Place süreçleri ve PCB üretimi alanlarında çalıştım. AutoCAD, KiCad ve Dialux başta olmak üzere çeşitli mühendislik yazılımlarını aktif olarak kullanıyorum. Ek olarak yazılım otomasyonları geliştirip bunları web sitemde paylaşıyorum.</p>"
+            bioHtml: "<p>Elektrik-Elektronik Mühendisliği ile müziğin tutkulu kesişim noktasında üreten bir mühendis ve müzisyenim. Müzikal tınıların arkasındaki donanımsal mimariyi, analog ses devrelerini ve efekt sistemlerini kendi mühendislik bakış açımla tasarlayıp hayata geçiriyorum.</p><p>Sadece sesin fiziği ve elektroniğiyle değil; aynı zamanda üretimi kolaylaştıran dijital yazılımlar, interaktif araçlar ve modern web teknolojileri geliştirerek çok yönlü projeler üretmeye devam ediyorum.</p>"
         },
         EN: {
             engineerText: "Electrical & Electronics Engineer",
@@ -26,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             bioTitle: "Who is Fatih Önday?",
             cvPdf: "assets/001-Fatih-Onday-CV-EN.pdf",
             cvJpg: "assets/001-Fatih-Onday-CV-EN.jpg",
-            bioHtml: "<p>I am an Electrical & Electronics Engineer with experience in electrical project design, site applications, and electronics manufacturing. Throughout my career, I have been involved in electrical installation projects, technical documentation, site coordination, SMD/THT production, Pick and Place assembly, and PCB manufacturing processes. I enjoy improving my technical skills and expanding my knowledge in electrical engineering, electronics manufacturing, and hardware development.</p>"
+            bioHtml: "<p>I am an Electrical and Electronics Engineer and musician producing at the passionate intersection of engineering and music. I design and build analog audio circuits, effect systems, and hardware architectures behind musical tones from an engineering perspective.</p><p>Beyond the physics and electronics of sound, I develop digital software, interactive tools, and modern web applications to streamline design and production workflows.</p>"
         },
         CN: {
             engineerText: "电气与电子工程师",
@@ -38,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             bioTitle: "Fatih Önday 简介",
             cvPdf: "assets/001-Fatih-Onday-CV-CN.pdf",
             cvJpg: "assets/001-Fatih-Onday-CV-CN.jpg",
-            bioHtml: "<p>电气与电子工程专业工程师，具备电气项目设计、现场工程及电子制造经验。 曾参与电气安装项目、技术文档编制、现场协调，以及SMT/THT生产、贴片（Pick and Place）和PCB制造等工作。 希望持续提升专业能力，在电气工程、电子制造及硬件开发领域不断成长，并参与具有挑战性的工程项目。</p>"
+            bioHtml: "<p>我是一名电气与电子工程师兼音乐人，致力于工程与音乐的热情交汇点。我从工程角度设计并开发模拟音频电路、音效系统以及音乐声效背后的硬件架构。</p><p>除了声音物理学和电子学之外，我还开发数字软件、互动工具和现代 Web 应用，以简化设计与生产流程。</p>"
         }
     };
 
