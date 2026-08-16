@@ -222,8 +222,6 @@ body.dark #dropZone { color: #aaa; border-color: #555; }
 /* ----------------------------------------------------
    KOD ALANI VE WATERMARK (ARKA PLAN LOGOSU) AYARLARI 
 ------------------------------------------------------- */
-
-/* 1. Editörün Kendisi */
 #editor { 
   flex: 1; 
   height: 100%; 
@@ -239,7 +237,6 @@ body.dark #editor {
   background-color: #282a36; 
 }
 
-/* 2. Filigran Logosu */
 #editor::before {
   content: "";
   position: absolute;
@@ -248,7 +245,7 @@ body.dark #editor {
   transform: translate(-50%, -50%);
   width: 280px;
   height: 280px;
-  background-image: url('../assets/ondayelectronicslogo2.png');
+  background-image: url('../assets/ondayelectronicslogosiyah.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -257,11 +254,10 @@ body.dark #editor {
   z-index: 1;
 }
 body.dark #editor::before {
-  background-image: url('../assets/ondayelectronicslogo1.png');
-  opacity: 0.15; /* Beyaz logonun karanlık temada daha belirgin olması için artırıldı */
+  background-image: url('../assets/ondayelectronicslogobeyaz.png');
+  opacity: 0.15;
 }
 
-/* 3. CodeMirror Katmanları */
 .CodeMirror { 
   position: relative;
   flex: 1; 
@@ -271,7 +267,6 @@ body.dark #editor::before {
   z-index: 2; 
 }
 
-/* YENİ: Dracula temasının kendi arka plan rengini kesin olarak saydam yapıyoruz */
 body.dark .CodeMirror, 
 body.dark .cm-s-dracula {
   background-color: transparent !important;
@@ -283,7 +278,6 @@ body.dark .cm-s-dracula {
   background-color: transparent !important;
 }
 
-/* 4. Satır Numaraları */
 .CodeMirror-gutters {
   z-index: 3 !important;
   background-color: #f7f7f7 !important;
@@ -350,7 +344,7 @@ body.dark .tab-item.active { background: #1e1e1e; color: #fff; border-bottom-col
 .tab-close:hover { background: rgba(0,0,0,0.1); color: #e74c3c; }
 
 /* ----------------------------------------------------
-   SAĞ ÜSTTE ŞEFFAF KOPYALA SİMGESİ VE ARAMA PANELİ
+   KOPYALA SİMGESİ VE ARAMA PANELİ
 ------------------------------------------------------- */
 .copy-icon-btn {
   position: absolute;
@@ -370,10 +364,7 @@ body.dark .tab-item.active { background: #1e1e1e; color: #fff; border-bottom-col
   opacity: 0.5; 
 }
 body.dark .copy-icon-btn { color: #aaa; }
-.copy-icon-btn:hover {
-  opacity: 1;
-  color: #007acc;
-}
+.copy-icon-btn:hover { opacity: 1; color: #007acc; }
 body.dark .copy-icon-btn:hover { color: #75beff; }
 
 .search-panel {
@@ -439,6 +430,9 @@ body.dark .cm-search-match-active { background-color: #d87b00; }
 
 #preview { width: 50%; height: 100%; border: none; background: #fff; }
 
+/* ----------------------------------------------------
+   KONSOL BÖLÜMÜ VE DARALTILMIŞ (MINIMIZED) YÖNETİMİ
+------------------------------------------------------- */
 #consoleBar {
   height: 160px;
   background: #1e1e1e;
@@ -456,6 +450,15 @@ body.dark .cm-search-match-active { background-color: #d87b00; }
 #consoleBar.minimized #consoleLogs { padding: 2px 6px; overflow: hidden; display: flex !important; }
 #consoleBar.minimized #consoleLogs .log-line { display: none; }
 #consoleBar.minimized #consoleLogs .log-line:last-child { display: flex !important; }
+
+/* YENİ: Daraltılmış modda girdi ekranı açıldığında logları gizle, girdiyi göster */
+#consoleBar.minimized.input-active #consoleLogs { display: none !important; }
+#consoleBar.minimized.input-active #consoleInputArea { 
+  display: flex !important; 
+  height: 25px; /* Sığması için */
+  padding: 2px 8px;
+  border-top: none;
+}
 
 .console-header { height: 28px; background: #252526; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; user-select: none; }
 .console-header-title { font-weight: bold; color: #aaa; font-size: 11px; }
