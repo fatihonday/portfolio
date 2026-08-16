@@ -4,22 +4,21 @@
   <meta charset="UTF-8">
   <title>codeeditor/ondayelectronics</title>
 
-  <!-- YENİ: Favicon yollarının başına "/" eklendi ve .ico fallback satırı eklendi -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="shortcut icon" href="/favicon.ico">
+  <!-- Favicon yolları bir üst dizindeki (ana repo) assets klasörüne yönlendirildi -->
+  <link id="dynamicFavicon" rel="icon" type="image/png" href="../assets/favicon-siyah.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/dracula.min.css">
 
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 
   <div id="topBar">
     <a href="https://ondayelectronics.com" class="logo-link" title="ondayelectronics.com">
-      <img id="siteLogo" src="assets/ondayelectronicslogo2.png" alt="Onday Electronics Logo" onerror="this.style.display='none'">
+      <!-- YENİ: Logo yolu bir üst klasöre (ana repo) çıkacak şekilde ayarlandı -->
+      <img id="siteLogo" src="../assets/ondayelectronicslogo2.png" alt="Onday Electronics Logo" onerror="this.style.display='none'">
     </a>
 
     <button class="btn-plain" id="btnToggleProjects">Projeler</button>
@@ -175,13 +174,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-  <script src="js/core/state.js"></script>
-  <script src="js/core/storage.js"></script>
-  <script src="js/components/console.js"></script>
-  <script src="js/components/fileTree.js"></script>
-  <script src="js/components/editor.js"></script>
-  <script src="js/components/schemaCanvas.js"></script>
-  <script src="js/services/bundler.js"></script>
-  <script src="js/main.js"></script>
+  <!-- YENİ: Yolların başındaki ./ klasör içinden okumayı garanti altına alır -->
+  <script src="./js/core/state.js"></script>
+  <script src="./js/core/storage.js"></script>
+  <script src="./js/components/console.js"></script>
+  <script src="./js/components/fileTree.js"></script>
+  <script src="./js/components/editor.js"></script>
+  <script src="./js/components/schemaCanvas.js"></script>
+  <script src="./js/services/bundler.js"></script>
+  <script src="./js/main.js"></script>
 </body>
 </html>
