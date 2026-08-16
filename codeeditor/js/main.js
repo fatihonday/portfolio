@@ -3,13 +3,13 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  initFaviconTheme(); // YENİ: Favicon tema dinleyicisi başlatıldı
+  initFaviconTheme();
   initEditor();
   initCanvasInteractions();
   bindEvents();
 });
 
-/* YENİ EKLENEN: Tarayıcı Temasına Göre Favicon Değiştirme Sistemi */
+/* Tarayıcı Temasına Göre Favicon Değiştirme Sistemi */
 function initFaviconTheme() {
   const matcher = window.matchMedia('(prefers-color-scheme: dark)');
   
@@ -23,10 +23,7 @@ function initFaviconTheme() {
     }
   }
 
-  // Tarayıcı teması her değiştiğinde tetiklenir (Canlı dinleme)
   matcher.addEventListener('change', updateFavicon);
-  
-  // Sayfa ilk yüklendiğinde mevcut duruma göre çalıştır
   updateFavicon(matcher);
 }
 
@@ -398,7 +395,8 @@ function toggleDarkMode() {
   const isDark = document.body.classList.toggle("dark");
   editor.setOption("theme", isDark ? "dracula" : "default");
   const logoImg = document.getElementById("siteLogo");
-  logoImg.src = isDark ? "assets/ondayelectronicslogo1.png" : "assets/ondayelectronicslogo2.png";
+  // YENİ: Editör içindeki marka logosu da bir üst klasörden çekiliyor
+  logoImg.src = isDark ? "../assets/ondayelectronicslogo1.png" : "../assets/ondayelectronicslogo2.png";
 }
 
 function toggleEditor() {
