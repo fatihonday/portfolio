@@ -8,8 +8,6 @@ function logToConsole(msg, type = "info") {
   const logsContainer = document.getElementById("consoleLogs");
   if (!logsContainer) return;
 
-  // YENİ: Başka bir işlem yapılıp yeni bir bildirim geldiğinde, 
-  // açık olan "girdi (input)" ekranını otomatik iptal et.
   if (activeInputCallback) {
     cancelConsoleInput();
   }
@@ -30,7 +28,6 @@ function logToConsole(msg, type = "info") {
   line.appendChild(msgSpan);
   logsContainer.appendChild(line);
 
-  // Her zaman en son bildirime (en aşağıya) kaydır
   logsContainer.scrollTop = logsContainer.scrollHeight;
 }
 
@@ -44,13 +41,11 @@ function requestConsoleInput(label, defaultValue = "", callback) {
   inputField.value = defaultValue;
   inputArea.style.display = "flex";
   
-  // Daraltılmış (minimized) modda CSS'in davranışını değiştirmesi için class ekliyoruz
   consoleBar.classList.add("input-active");
 
   activeInputCallback = callback;
   inputField.focus();
   
-  // Konsol bar tamamen gizliyse zorla aç
   if (consoleBar.style.display === "none" || consoleBar.style.display === "") {
     consoleBar.style.display = "flex";
   }
@@ -59,9 +54,9 @@ function requestConsoleInput(label, defaultValue = "", callback) {
 function submitConsoleInput() {
   if (activeInputCallback) {
     const val = document.getElementById("consoleInput").value;
-    const cb = activeInputCallback; // Referansı kopyala
-    cancelConsoleInput(); // Ekranı ve state'i temizle
-    cb(val); // Kullanıcının fonksiyonunu çalıştır
+    const cb = activeInputCallback;
+    cancelConsoleInput(); 
+    cb(val); 
   }
 }
 
@@ -70,7 +65,7 @@ function cancelConsoleInput() {
   const consoleBar = document.getElementById("consoleBar");
   
   if (inputArea) inputArea.style.display = "none";
-  if (consoleBar) consoleBar.classList.remove("input-active"); // CSS class'ını kaldır
+  if (consoleBar) consoleBar.classList.remove("input-active");
   
   activeInputCallback = null;
 }
@@ -86,9 +81,20 @@ function toggleConsoleBar(forceOpen = null) {
   }
 }
 
+// YENİ: Daraltma/Genişletme esnasında ok işaretini dinamik olarak değiştirir.
 function toggleConsoleMinimize() {
   const consoleBar = document.getElementById("consoleBar");
+  const btn = document.getElementById("consoleMinMaxBtn");
+  
   consoleBar.classList.toggle("minimized");
+  
+  if (consoleBar.classList.contains("minimized")) {
+    btn.textContent = "▲"; // Konsol dar, genişletmek için yukarı ok
+    btn.title = "Genişlet";
+  } else {
+    btn.textContent = "▼"; // Konsol geniş, daraltmak için aşağı ok
+    btn.title = "Daralt";
+  }
 }
 
 function clearConsoleLogs() {
