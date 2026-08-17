@@ -14,10 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Favicon ve Ana Tema dinleyicisini başlat
+  // DÜZELTİLDİ: Tema algılamayı başlatmadan ÖNCE editörü başlatmalıyız!
+  initEditor(); 
+  
+  // Artık editör hazır olduğuna göre temasını güvenle güncelleyebiliriz
   initThemeAndFavicon(); 
   
-  initEditor();
   initCanvasInteractions();
   bindEvents();
 });
@@ -45,10 +47,9 @@ function initThemeAndFavicon() {
       if (editor) editor.setOption("theme", "default");
     }
     
-    // Üst Çubuk (Top Bar) ve Düzenleyici İçi Logoları Güncelle
+    // Üst Çubuk (Top Bar) Logosunu Güncelle
     const topBarLogo = document.getElementById("siteLogo");
     if (topBarLogo) {
-      // YENİ: Üst çubuktaki logolar (logo1 ve logo2 kullanılıyor)
       topBarLogo.src = isDark ? "../assets/ondayelectronicslogo1.png" : "../assets/ondayelectronicslogo2.png";
     }
   }
@@ -411,7 +412,7 @@ function openFile(e) {
   reader.readAsText(file);
 }
 
-// YENİ: Tema Butonuyla Manuel Geçiş (Otomatik temayı geçersiz kılar)
+// Tema Butonuyla Manuel Geçiş
 function toggleDarkMode() {
   const isDark = document.body.classList.toggle("dark");
   
@@ -419,13 +420,11 @@ function toggleDarkMode() {
     editor.setOption("theme", isDark ? "dracula" : "default");
   }
   
-  // Üst çubuk logosunu manuel olarak güncelle
   const topBarLogo = document.getElementById("siteLogo");
   if (topBarLogo) {
     topBarLogo.src = isDark ? "../assets/ondayelectronicslogo1.png" : "../assets/ondayelectronicslogo2.png";
   }
   
-  // Favicon'u manuel olarak güncelle
   const iconUrl = isDark ? '../assets/favicon-beyaz.png' : '../assets/favicon-siyah.png';
   const link = document.getElementById('dynamicFavicon');
   if (link) {
