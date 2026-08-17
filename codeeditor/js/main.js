@@ -3,7 +3,7 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Uygulama açılır açılmaz konsolu daraltılmış (minimized) modda başlat
+  // Konsolu başlangıçta daraltılmış modda başlat
   const consoleBar = document.getElementById("consoleBar");
   if (consoleBar) {
     consoleBar.classList.add("minimized");
@@ -14,70 +14,66 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // DÜZELTİLDİ: Tema algılamayı başlatmadan ÖNCE editörü başlatmalıyız!
   initEditor(); 
   
-  // Artık editör hazır olduğuna göre temasını güvenle güncelleyebiliriz
-  initThemeAndFavicon(); 
+  // Favicon ve arayüz teması birbirinden izole edildi
+  initSystemFavicon(); 
+  initInitialTheme(); 
   
   initCanvasInteractions();
   bindEvents();
 });
 
-/* Tarayıcı Temasına Göre Favicon ve Arayüz Teması Değiştirme Sistemi */
-function initThemeAndFavicon() {
+/* SADECE SİSTEM TEMASINA BAĞLI ÇALIŞAN İZOLE FAVICON FONKSİYONU */
+function initSystemFavicon() {
   const matcher = window.matchMedia('(prefers-color-scheme: dark)');
   
-  function applyTheme(e) {
-    const isDark = e.matches;
-    
-    // Favicon Güncelleme
-    const iconUrl = isDark ? '../assets/favicon-beyaz.png' : '../assets/favicon-siyah.png';
+  function updateFavicon(e) {
     const link = document.getElementById('dynamicFavicon');
     if (link) {
-      link.href = iconUrl;
-    }
-    
-    // Arayüz Temasını Otomatik Güncelleme
-    if (isDark) {
-      document.body.classList.add("dark");
-      if (editor) editor.setOption("theme", "dracula");
-    } else {
-      document.body.classList.remove("dark");
-      if (editor) editor.setOption("theme", "default");
-    }
-    
-    // Üst Çubuk (Top Bar) Logosunu Güncelle
-    const topBarLogo = document.getElementById("siteLogo");
-    if (topBarLogo) {
-      topBarLogo.src = isDark ? "../assets/ondayelectronicslogo1.png" : "../assets/ondayelectronicslogo2.png";
+      link.href = e.matches ? '../assets/favicon-beyaz.png' : '../assets/favicon-siyah.png';
     }
   }
 
-  // Temayı algıla ve uygula
-  matcher.addEventListener('change', applyTheme);
-  applyTheme(matcher);
+  matcher.addEventListener('change', updateFavicon);
+  updateFavicon(matcher); // Açılışta ilk kontrol
+}
+
+/* SADECE AÇILIŞTAKİ SİSTEM TEMASINI ALGILAYIP ARAYÜZÜ AYARLAYAN FONKSİYON */
+function initInitialTheme() {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  if (isDark) {
+    document.body.classList.add("dark");
+    if (editor) editor.setOption("theme", "dracula");
+  } else {
+    document.body.classList.remove("dark");
+    if (editor) editor.setOption("theme", "default");
+  }
+  
+  // Üst Çubuk Logosunu Ayarla
+  const topBarLogo = document.getElementById("siteLogo");
+  if (topBarLogo) {
+    topBarLogo.src = isDark ? "./assets/ondayelectronicslogo1.png" : "./assets/ondayelectronicslogo2.png";
+  }
 }
 
 function bindEvents() {
-  // TopBar Butonları
   document.getElementById("btnToggleProjects").onclick = () => toggleSidebar("projectsSidebar");
   document.getElementById("projectTitleDisplay").onclick = () => toggleSidebar("toolsSidebar");
   document.getElementById("btnOpenFile").onclick = () => document.getElementById("fileInput").click();
   document.getElementById("fileInput").onchange = openFile;
   
-  // Tema butonuna basıldığında manuel olarak temanın değiştirilmesi
+  // Tema butonuna basıldığında manuel geçiş (Favicon etkilenmez)
   document.getElementById("btnToggleTheme").onclick = toggleDarkMode;
   
   document.getElementById("btnToggleEditor").onclick = toggleEditor;
   document.getElementById("consoleToggleBtn").onclick = () => toggleConsoleBar();
 
-  // Sidebar Kapatma
   document.querySelectorAll(".close-sidebar-btn").forEach(btn => {
     btn.onclick = closeSidebars;
   });
 
-  // Araçlar 
   document.getElementById("btnSaveProject").onclick = saveProject;
   document.getElementById("btnSaveAsProject").onclick = initSaveAsProject;
   document.getElementById("btnRunCode").onclick = runCode;
@@ -86,15 +82,12 @@ function bindEvents() {
   document.getElementById("btnDownloadZip").onclick = downloadProjectAsZip;
   document.getElementById("btnOpenNotepad").onclick = openNotepadModal;
 
-  // Ağaç Butonları
   document.getElementById("btnAddFile").onclick = () => promptCreateFile();
   document.getElementById("btnAddFolder").onclick = () => promptCreateFolder();
   document.getElementById("btnOpenSchema").onclick = openSchemaModal;
 
-  // Kopyala Butonu
   document.getElementById("btnCopyCodeIcon").onclick = copyCodeToClipboard;
 
-  // Arama Paneli Butonları
   const searchInput = document.getElementById("searchInput");
   searchInput.oninput = (e) => performSearch(e.target.value);
   searchInput.onkeydown = (e) => {
@@ -110,14 +103,12 @@ function bindEvents() {
   document.getElementById("searchPrev").onclick = prevSearchMatch;
   document.getElementById("searchClose").onclick = closeSearchPanel;
 
-  // Konsol Eventleri
   document.getElementById("btnClearConsoleLogs").onclick = clearConsoleLogs;
   document.getElementById("consoleMinMaxBtn").onclick = toggleConsoleMinimize;
   document.getElementById("btnCloseConsole").onclick = () => toggleConsoleBar(false);
   document.getElementById("consoleInputBtn").onclick = submitConsoleInput;
   document.getElementById("consoleInput").onkeyup = (e) => { if (e.key === "Enter") submitConsoleInput(); };
 
-  // Modallar
   document.querySelectorAll(".close-modal-btn").forEach(btn => {
     btn.onclick = () => {
       document.getElementById("notepadModal").style.display = "none";
@@ -127,7 +118,6 @@ function bindEvents() {
   document.getElementById("btnSaveNotepad").onclick = saveNotepad;
   document.getElementById("btnResetCanvas").onclick = resetCanvasTransform;
 
-  // File Upload / Dropzone
   const dropZone = document.getElementById("dropZone");
   dropZone.onclick = () => document.getElementById("fileUpload").click();
   document.getElementById("fileUpload").onchange = (e) => {
@@ -141,7 +131,6 @@ function bindEvents() {
     if (e.dataTransfer.files.length > 0) handleFileUpload(e.dataTransfer.files[0]);
   });
 
-  // Editör Değişim Takibi
   editor.on("change", () => {
     if (state.activeFilePath) {
       const activeNode = getNodeByPath(state.activeFilePath);
@@ -420,16 +409,13 @@ function toggleDarkMode() {
     editor.setOption("theme", isDark ? "dracula" : "default");
   }
   
+  // DÜZELTİLDİ: Manuel tema değişiminde üst bar logosu yolu kesinleştirildi
   const topBarLogo = document.getElementById("siteLogo");
   if (topBarLogo) {
-    topBarLogo.src = isDark ? "../assets/ondayelectronicslogo1.png" : "../assets/ondayelectronicslogo2.png";
+    topBarLogo.src = isDark ? "./assets/ondayelectronicslogo1.png" : "./assets/ondayelectronicslogo2.png";
   }
   
-  const iconUrl = isDark ? '../assets/favicon-beyaz.png' : '../assets/favicon-siyah.png';
-  const link = document.getElementById('dynamicFavicon');
-  if (link) {
-    link.href = iconUrl;
-  }
+  // Favicon güncellemesi tamamen bu alandan çıkartıldı, artık favicna dokunmuyoruz.
 }
 
 function toggleEditor() {
